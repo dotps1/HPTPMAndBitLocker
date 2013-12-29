@@ -35,7 +35,7 @@
     [CmdletBinding()]  
     param 
         (
-        [String] $ComputerName = $env:COMPUTERNAME
+        [String]$ComputerName = $env:COMPUTERNAME
         )
 
     if (!(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) {
@@ -115,8 +115,8 @@ function Get-BitLockerStatus {
     [CmdletBinding()]        
     param
         (
-        [String] $ComputerName = $env:COMPUTERNAME,
-        [String] $DriveLetter
+        [String]$ComputerName = $env:COMPUTERNAME,
+        [String]$DriveLetter
         )
 
     if (!(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) {
@@ -269,7 +269,12 @@ function Invoke-BitLockerWithTpmAndNumricalProtectors {
     if ($volume.GetKeyProtectors(3).VolumeKeyProtectorID -eq $null) {
         $volume.ProtectKeyWithNumericalPassword()
         if ($ADKeyBackup) {
-            $volume.BackupRecoveryInformationToActiveDirectory($volume.GetKeyProtectors(3).VolumeKeyProtectorID)
+            try {
+                $volume.BackupRecoveryInformationToActiveDirectory($volume.GetKeyProtectors(3).VolumeKeyProtectorID)
+                }
+            catch {
+                Throw 'There was an error backing up the information to AD DS, please use the Get-Help Invoke-BitLockerWithTpmAndNumricalProtectors cmdlet and verify all settings are correct to use this function.'
+                }
             }
         }
     if ($volume.GetKeyProtectors(1).VolumeKeyProtectorID -eq $null) {

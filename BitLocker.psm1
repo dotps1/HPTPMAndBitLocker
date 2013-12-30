@@ -164,10 +164,10 @@ function Get-BitLockerStatus {
         switch ($status.ConversionStatus) {
             0 { Write-Host "FullyDecrypted" }
             1 { Write-Host "FullyEncrypted" }
-            2 { Write-Host "EncryptionInProgress" -NoNewline; Write-Host "  PercentageComplete: " $status.EncryptionPercentage }
-            3 { Write-Host "DecryptionInProgress" -NoNewline; Write-Host "  PercentageComplete: " $status.EncryptionPercentage }
-            4 { Write-Host "EncryptionPaused" -NoNewline; Write-Host "  PercentageComplete: " $status.EncryptionPercentage }
-            5 { Write-Host "DecryptionPaused" -NoNewline; Write-Host "  PercentageComplete: " $status.EncryptionPercentage }
+            2 { Write-Host "EncryptionInProgress"; Write-Host "PercentageComplete: " $status.EncryptionPercentage }
+            3 { Write-Host "DecryptionInProgress"; Write-Host "PercentageComplete: " $status.EncryptionPercentage }
+            4 { Write-Host "EncryptionPaused"; Write-Host "PercentageComplete: " $status.EncryptionPercentage }
+            5 { Write-Host "DecryptionPaused"; Write-Host "PercentageComplete: " $status.EncryptionPercentage }
             }
         }
         
@@ -280,7 +280,7 @@ function Invoke-BitLockerWithTpmAndNumricalProtectors {
             }
         }
 
-    if ($volume.GetKeyProtectors(3).VolumeKeyProtectorID -eq $null) {
+    if (!($volume.GetKeyProtectors(3).VolumeKeyProtectorID)) {
         $volume.ProtectKeyWithNumericalPassword()
         if ($ADKeyBackup) {
             try {
@@ -291,7 +291,7 @@ function Invoke-BitLockerWithTpmAndNumricalProtectors {
                 }
             }
         }
-    if ($volume.GetKeyProtectors(1).VolumeKeyProtectorID -eq $null) {
+    if (!($volume.GetKeyProtectors(1).VolumeKeyProtectorID)) {
         $volume.ProtectKeyWithTPM()
         }
 

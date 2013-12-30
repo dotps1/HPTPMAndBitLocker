@@ -130,7 +130,7 @@ function Get-BitLockerStatus {
             $volume = Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$($drive.SystemDrive)'" -ComputerName $ComputerName -ErrorAction Stop
             }
         catch {
-            Write-Error 'Unable to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the "OperationSystem" and "EncryptableVolume" Namespaces.'
+            Write-Error 'Unable to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the "OperatingSystem" and "EncryptableVolume" Namespaces.'
             return $false
             }
         }

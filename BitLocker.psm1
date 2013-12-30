@@ -149,6 +149,7 @@ function Get-BitLockerStatus {
         if ($DriveLetter.Length -gt 2) {
             Throw 'The DriveLetter Paramter must be formated with a single letter, followed by the ":" character.'
             }
+
         $volume = Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
         if ($volume -eq $null) {
             Write-Error 'Unable to enumarate the "EncryptableVolume" WMI Namespace for drive ' + $DriveLetter + '.  Please make sure the drive letter is correct and that the volume is accessable.'
@@ -267,9 +268,13 @@ function Invoke-BitLockerWithTpmAndNumricalProtectors {
             }
         }
     else {
-        if (!($DriveLetter.Contains(":"))) {
+        if (!($DriveLetter.EndsWith(":"))) {
             $DriveLetter = $DriveLetter + ":"
             }
+        if ($DriveLetter.Length -gt 2) {
+            Throw 'The DriveLetter Paramter must be formated with a single letter, followed by the ":" character.'
+            }
+
         $volume = Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
         if ($volume -eq $null) {
             Write-Error 'Unable to enumarate the "EncryptableVolume" WMI Namespace for drive ' + $DriveLetter + '.  Please make sure the drive letter is correct and that the volume is accessable.'

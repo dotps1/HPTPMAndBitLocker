@@ -147,7 +147,8 @@ function Get-BitLockerStatus {
             $DriveLetter = $DriveLetter + ":"
             }
         if ($DriveLetter.Length -gt 2) {
-            Throw 'The DriveLetter Paramter must be formated with a single letter, followed by the ":" character.'
+            Write-Error 'The DriveLetter Paramter must be formated with a single letter, followed by the ":" character.'
+            return $false
             }
 
         $volume = Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
@@ -242,8 +243,7 @@ function Invoke-BitLockerWithTpmAndNumricalProtectors {
         )
 
     if (!(Get-TpmStatus -ComputerName $ComputerName)) {
-        Write-Error 'TPM is currently not Enabled, Activated or Both.  Use the Get-TpmStatus -Verbose cmdlet to investigate the TPMs current Phyisical State.'
-        return $false
+        throw 'TPM is currently not Enabled, Activated or Both.  Use the Get-TpmStatus -Verbose cmdlet to investigate the TPMs current Phyisical State.'
         }
 
     $tpm = Get-WmiObject -Class Win32_Tpm -Namespace "root\CIMV2\Security\MicrosoftTpm" -ComputerName $ComputerName -ErrorAction Stop
@@ -263,8 +263,7 @@ function Invoke-BitLockerWithTpmAndNumricalProtectors {
             $volume = Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$($drive.SystemDrive)'" -ComputerName $ComputerName -ErrorAction Stop
             }
         catch {
-            Write-Error 'Unable to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the "OperationSystem" and "EncryptableVolume" Namespaces.'
-            return $false
+            throw 'Unable to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the "OperationSystem" and "EncryptableVolume" Namespaces.'
             }
         }
     else {
@@ -272,13 +271,12 @@ function Invoke-BitLockerWithTpmAndNumricalProtectors {
             $DriveLetter = $DriveLetter + ":"
             }
         if ($DriveLetter.Length -gt 2) {
-            Throw 'The DriveLetter Paramter must be formated with a single letter, followed by the ":" character.'
+            throw 'The DriveLetter Paramter must be formated with a single letter, followed by the ":" character.'
             }
 
         $volume = Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
         if ($volume -eq $null) {
-            Write-Error 'Unable to enumarate the "EncryptableVolume" WMI Namespace for drive ' + $DriveLetter + '.  Please make sure the drive letter is correct and that the volume is accessable.'
-            return $false
+            throw 'Unable to enumarate the "EncryptableVolume" WMI Namespace for drive ' + $DriveLetter + '.  Please make sure the drive letter is correct and that the volume is accessable.'
             }
         }
 
@@ -289,7 +287,7 @@ function Invoke-BitLockerWithTpmAndNumricalProtectors {
                 $volume.BackupRecoveryInformationToActiveDirectory($volume.GetKeyProtectors(3).VolumeKeyProtectorID)
                 }
             catch {
-                Throw 'There was an error backing up the information to AD DS, please use the Get-Help Invoke-BitLockerWithTpmAndNumricalProtectors cmdlet and verify all settings are correct to use this function.'
+                throw 'There was an error backing up the information to AD DS, please use the Get-Help Invoke-BitLockerWithTpmAndNumricalProtectors cmdlet and verify all settings are correct to use this function.'
                 }
             }
         }

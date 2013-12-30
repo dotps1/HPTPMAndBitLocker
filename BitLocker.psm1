@@ -30,6 +30,10 @@
 
     In this example, the TPM Status is returned from a remote computer with user friendly readable information.
 
+    .LINKS
+
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa376484%28v=vs.85%29.aspx
+
     #>
     
     [CmdletBinding()]  
@@ -109,6 +113,10 @@ function Get-BitLockerStatus {
     Get-BitLockerStatus -ComputerName "MyComputer.MyDomain.org" -DriveLetter "C:"
 
     In this example, the BDE Status is returned from the C: drive on remote computer.
+
+    .LINKS
+
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa376483%28v=vs.85%29.aspx
 
     #>
     

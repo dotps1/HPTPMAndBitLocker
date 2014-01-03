@@ -33,7 +33,6 @@
     .LINKS
 
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376484%28v=vs.85%29.aspx
-
     #>
     
     [CmdletBinding()]  
@@ -43,7 +42,7 @@
         )
 
     if (!(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) {
-        Write-Error 'Unable to connect to ' + $ComputerName + '.  Please ensure the system is available, and that you have sufficent rights to connect to the Remote Windows Management Interface.'
+        Write-Error "Unable to connect to $ComputerName.  Please ensure the system is available, and that you have sufficent rights to connect to the Remote Windows Management Interface."
         return $false
         }
 
@@ -51,7 +50,7 @@
         $tpm = Get-WmiObject -Class Win32_Tpm -Namespace "root\CIMV2\Security\MicrosoftTpm" -ComputerName $ComputerName -ErrorAction Stop
         }
     catch {
-        Write-Error 'Unable to connect to the "Win32_Tpm" Namespace, You may not have sufficent rights.'
+        Write-Error "Unable to connect to the Win32_Tpm Namespace, You may not have sufficent rights."
         return $false
         }
 
@@ -117,7 +116,6 @@ function Get-BitLockerStatus {
     .LINKS
 
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376483%28v=vs.85%29.aspx
-
     #>
     
     [CmdletBinding()]        
@@ -128,7 +126,7 @@ function Get-BitLockerStatus {
         )
 
     if (!(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) {
-        Write-Error 'Unable to connect to ' + $ComputerName + '.  Please ensure the system is available, and that you have sufficent rights to connect to the Remote Windows Management Interface.'
+        Write-Error "Unable to connect to $ComputerName.  Please ensure the system is available, and that you have sufficent rights to connect to the Remote Windows Management Interface."
         return $false
         }
 
@@ -153,7 +151,7 @@ function Get-BitLockerStatus {
 
         $volume = Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
         if ($volume -eq $null) {
-            Write-Error 'Unable to enumarate the "EncryptableVolume" WMI Namespace for drive ' + $DriveLetter + '.  Please make sure the drive letter is correct and that the volume is accessable.'
+            Write-Error "Unable to enumarate the EncryptableVolume Namespace for drive $DriveLetter.  Please make sure the drive letter is correct and that the volume is accessable."
             return $false
             }
         }
@@ -188,7 +186,7 @@ function Get-BitLockerStatus {
     }
 
 function Invoke-BitLockerWithTpmAndNumricalProtectors {
-        <#
+    <#
     .SYNOPSIS
 
     This function is to be used to Enable or Resume BitLocker with Key and TPM Key Protectors
@@ -231,7 +229,6 @@ function Invoke-BitLockerWithTpmAndNumricalProtectors {
     Invoke-BitLockerWithTpmAndNumricalProtectors -ComputerName "MyComputer.MyDomain.org" -DriveLetter "F:" -ADKeyBackup $false
 
     In this example, BitLocker will be triggered on the remote machine, for Drive "F:" and the key password will NOT be backup to AD.
-
     #>
     
     [CmdletBinding()]  
@@ -243,13 +240,13 @@ function Invoke-BitLockerWithTpmAndNumricalProtectors {
         )
 
     if (!(Get-TpmStatus -ComputerName $ComputerName)) {
-        throw 'TPM is currently not Enabled, Activated or Both.  Use the Get-TpmStatus -Verbose cmdlet to investigate the TPMs current Phyisical State.'
+        throw 'TPM is currently not Enabled, Activated or Both.  Use the Get-TpmStatus cmdlet to investigate the TPMs current Phyisical State.'
         }
 
     $tpm = Get-WmiObject -Class Win32_Tpm -Namespace "root\CIMV2\Security\MicrosoftTpm" -ComputerName $ComputerName -ErrorAction Stop
     if (!($tpm.IsOwned_InitialValue)) {
         $charArray = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray()
-        $random = [String]::Empty()
+        $random = ""
         for ($x = 0; $x -lt 15; $x++) {
             $random += $charArray | Get-Random
             }
@@ -263,7 +260,7 @@ function Invoke-BitLockerWithTpmAndNumricalProtectors {
             $volume = Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$($drive.SystemDrive)'" -ComputerName $ComputerName -ErrorAction Stop
             }
         catch {
-            throw 'Unable to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the "OperationSystem" and "EncryptableVolume" Namespaces.'
+            throw 'Unable to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the OperatingSystem and EncryptableVolume Namespaces.'
             }
         }
     else {
@@ -276,7 +273,7 @@ function Invoke-BitLockerWithTpmAndNumricalProtectors {
 
         $volume = Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
         if ($volume -eq $null) {
-            throw 'Unable to enumarate the "EncryptableVolume" WMI Namespace for drive ' + $DriveLetter + '.  Please make sure the drive letter is correct and that the volume is accessable.'
+            throw 'Unable to enumarate the EncryptableVolume Namespace for drive ' + $DriveLetter + '.  Please make sure the drive letter is correct and that the volume is accessable.'
             }
         }
 

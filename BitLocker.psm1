@@ -242,6 +242,9 @@ function Invoke-BitLockerWithTpmAndNumricalProtectors {
     if (!(Get-TpmStatus -ComputerName $ComputerName)) {
         throw 'TPM is currently not Enabled, Activated or Both.  Use the Get-TpmStatus cmdlet to investigate the TPMs current Phyisical State.'
         }
+    if (Get-BitLockerStatus -ComputerName $ComputerName) {
+        throw 'BitLocker is already Enabled and Protection Status is on.'
+        }
 
     $tpm = Get-WmiObject -Class Win32_Tpm -Namespace "root\CIMV2\Security\MicrosoftTpm" -ComputerName $ComputerName -ErrorAction Stop
     if (!($tpm.IsOwned_InitialValue)) {

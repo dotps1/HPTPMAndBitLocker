@@ -288,19 +288,19 @@ function Invoke-BitLockerWithTpmAndNumricalKeyProtectors {
         }
         if (-not($volume.GetKeyProtectors(1).VolumeKeyProtectorID))
         {
-            $volume.ProtectKeyWithTPM()
+            $volume.ProtectKeyWithTPM() | Out-Null
         }
 
         switch ($volume.GetConversionStatus().ConversionStatus) 
         {
-            0 { $volume.Encrypt() }
-            1 { if ($volume.ProtectionStatus -eq 0) { $volume.EnableKeyProtectors() } }
-            4 { $volume.ResumeConversion() }
+            0 { $volume.Encrypt() | Out-Null }
+            1 { if ($volume.ProtectionStatus -eq 0) { $volume.EnableKeyProtectors() | Out-Null } }
+            4 { $volume.ResumeConversion() | 0ut-Null }
         }
     }
     End
     {
-    Get-BitLockerStatus -ComputerName $ComputerName -DriveLetter $volume
+    Get-BitLockerStatus -ComputerName $ComputerName -DriveLetter $volume.DriveLetter -Verbose
     }
 }
 

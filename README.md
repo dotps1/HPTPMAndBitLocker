@@ -8,7 +8,7 @@ https://github.com/necromorph1024/HPBiosConfigurationPowershellModule
 
 In my current Domain Envrionment, with this module, I can enforce BDE with the following logic:
 
-If ((Get-TpmStatus) -and (-not(Get-BitLockerStatus -ADKeyBackup %true)))
+If ((Get-TpmStatus) -and (-not(Get-BitLockerStatus -ADKeyBackup $true)))
 {
 	Invoke-BitLockerWithTpmAndNumricalKeyProtectors
 }

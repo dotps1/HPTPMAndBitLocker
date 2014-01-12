@@ -13,8 +13,8 @@
     https://github.com/necromorph1024/BitLockerPowershellModule
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376484%28v=vs.85%29.aspx
 #>
-function Get-TpmStatus {
-    
+function Get-TpmStatus 
+{
     [CmdletBinding()]
     [OutputType([bool])]
     Param 
@@ -95,8 +95,8 @@ function Get-TpmStatus {
     https://github.com/necromorph1024/BitLockerPowershellModule
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376483%28v=vs.85%29.aspx
 #>
-function Get-BitLockerStatus {
-    
+function Get-BitLockerStatus 
+{    
     [CmdletBinding()]
     [OutputType([bool])]
     Param
@@ -202,8 +202,8 @@ function Get-BitLockerStatus {
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376483%28v=vs.85%29.aspx
     http://technet.microsoft.com/en-us/library/dd875529%28v=ws.10%29.aspx
 #>
-function Invoke-BitLockerWithTpmAndNumricalKeyProtectors {
-    
+function Invoke-BitLockerWithTpmAndNumricalKeyProtectors 
+{    
     [CmdletBinding()]
     [OutputType([void])] 
     Param

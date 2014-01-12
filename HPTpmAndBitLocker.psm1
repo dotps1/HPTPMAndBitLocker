@@ -8,6 +8,7 @@
 .EXAMPLE
     Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Setup Password"," ",$SetupPassword))
 .LINKS
+    https://github.com/necromorph1024/HPTpmAndBitLocker
     http://h20331.www2.hp.com/Hpsub/downloads/cmi_whitepaper.pdf  Page: 14
 #>
 function Out-HPVerboseReturnValues
@@ -38,12 +39,13 @@ function Out-HPVerboseReturnValues
 
 <#
 .Synopsis
-    Converts 8-30 charcter string to KBD encoding.
+    Converts string to KBD encoded string.
 .DESCRIPTION
-    Converts UTF16 String to Keyboard Scan Hex Value (KBD).  Older HP BIOS's only accept this encoding method, usful for WMI BIOS Administration.
+    Converts UTF16 string to Keyboard Scan Hex Value (KBD).  Older HP BIOS's only accept this encoding method for setup passwords, usful for WMI BIOS Administration.
 .EXAMPLE
     Convert-ToKbdString -UTF16String "MyStringToConvert"
 .LINKS
+    https://github.com/necromorph1024/HPTpmAndBitLocker
     http://www.codeproject.com/Articles/7305/Keyboard-Events-Simulation-using-keybd_event-funct
     http://msdn.microsoft.com/en-us/library/aa299374%28v=vs.60%29.aspx
     http://h20331.www2.hp.com/Hpsub/downloads/cmi_whitepaper.pdf  Page: 14
@@ -174,6 +176,8 @@ function Convert-ToKbdString
     Get-HpSetupPasswordIsSet
 .EXAMPLE
     Get-HpSetupPasswordIsSet -ComputerName "mycomputer.mydomain.org
+.LINKS
+    https://github.com/necromorph1024/HPTpmAndBitLocker
 #>
 function Get-HpSetupPasswordIsSet
 {
@@ -227,11 +231,15 @@ function Get-HpSetupPasswordIsSet
     Sets the Setup Password on an HP Bios.
 .DESCRIPTION
     This function can be used to set a password on the Bios, it can also be used to clear the password, the current password is needed to change the value.
-    If a new value is being set, and not cleared, it must be between 8 and 30 charcters.
+    If a new value is being set, and not cleared, it must be between 8 and 30 characters.
 .EXAMPLE
     Set-HpSetupPassword -NewSetupPassword "MyNewPassword"
 .EXAMPLE
     Set-HpSetupPassword -ComputerName "mycomputer.mydomain.org" -NewSetupPassword " " -CurrentSetupPassword "MyCurrentPassword"
+.EXAMPLE
+    Set-HpSetupPassword -NewSetupPassword "MyNewSetupPassword" -CurrentSetupPassword "MyCurrentPassword"
+.LINKS
+    https://github.com/necromorph1024/HPTpmAndBitLocker
 #>
 function Set-HpSetupPassword
 {
@@ -318,9 +326,9 @@ function Set-HpSetupPassword
 .EXAMPLE
    Get-TpmStatus -ComputerName "mycomputer.mydomain.org" -Verbose
 .NOTES
-    Usethe -Verbose switch for user friendly STDOUT.
+    Use the -Verbose switch for user friendly STDOUT.
 .LINKS
-    https://github.com/necromorph1024/BitLockerPowershellModule
+    https://github.com/necromorph1024/HPTpmAndBitLocker
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376484%28v=vs.85%29.aspx
 #>
 function Get-TpmStatus 
@@ -396,6 +404,10 @@ function Get-TpmStatus
     Invoke-HpTpm -SetupPassword "MyPassword"
 .EXAMPLE
     Invoke-HpTpm -ComputerName "mycomputer.mydomain.org" -SetupPassword "MyPassword"
+.EXAMPLE
+    Invoke-HpTpm -SetupPassword "ABCD1234" -RestartComputer -RestartDelay 30
+.LINKS
+    https://github.com/necromorph1024/HPTpmAndBitLocker
 #>
 function Invoke-HpTpm
 {
@@ -519,7 +531,7 @@ function Invoke-HpTpm
     The drive letter must be followed with a double colon ":".
     Use the -Verbose switch for user friendly STDOUT.
 .LINKS
-    https://github.com/necromorph1024/BitLockerPowershellModule
+    https://github.com/necromorph1024/HPTpmAndBitLocker
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376483%28v=vs.85%29.aspx
 #>
 function Get-BitLockerStatus 
@@ -623,7 +635,7 @@ function Get-BitLockerStatus
     This function will resume encryption if currently paused, or suspended.
     If used outside of the scope of this module, the Get-TpmStatus and Get-BitLockerStatus cmdlets are required.
 .LINKS
-    https://github.com/necromorph1024/BitLockerPowershellModule
+    https://github.com/necromorph1024/HPTpmAndBitLocker
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376483%28v=vs.85%29.aspx
     http://technet.microsoft.com/en-us/library/dd875529%28v=ws.10%29.aspx
 #>

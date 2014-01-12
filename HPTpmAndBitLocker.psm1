@@ -259,10 +259,9 @@ function Set-HpSetupPassword
         [string]
         $NewSetupPassword,
 
-        # CurrentSetupPassword, Type string, The value of the current setup password.
+        # CurrentSetupPassword, Type string, The value of the current setup password.  If no set password, use space surrounded by double quotes, IE: " ".
         [Parameter(Mandatory=$false,
                    Position=2)]
-        [AllowEmptyString()]
         [string]
         $CurrentSetupPassword
     )
@@ -297,21 +296,14 @@ function Set-HpSetupPassword
             }
         }
 
-        $hpBios = Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
-        $hpBiosSettings = Get-WmiObject -Class HPBIOS_BIOSSettingInterface -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction stop
+        $hpBios=Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
+        $hpBiosSettings=Get-WmiObject -Class HPBIOS_BIOSSettingInterface -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction stop
 
-        if (($hpBios | Where-Object { $_.Name -eq "Setup Password"}).SupportedEncoding -eq "kbd")
+        switch (($hpBios | Where-Object { $_.Name -eq "Setup Password" }).SupportedEncoding)
         {
-            if (-not([String]::IsNullOrEmpty($NewSetupPassword)))
-            {
-                $NewSetupPassword="<kbd/>"+(Convert-ToKbdString -UTF16String $NewSetupPassword)
-            }
-            if (-not([String]::IsNullOrEmpty($CurrentSetupPassword)))
-            {
-                $CurrentSetupPassword="<kbd/>"+(Convert-ToKbdString -UTF16String $CurrentSetupPassword)
-            }
+            "kbd"{ $NewSetupPassword="<kbd/>"+(Convert-ToKbdString -UTF16String $NewSetupPassword); $CurrentSetupPassword="<kbd/>"+(Convert-ToKbdString -UTF16String $CurrentSetupPassword) }
+            "utf-16"{ $NewSetupPassword="<utf-16/>"+$NewSetupPassword; $CurrentSetupPassword="<utf-16/>"+$CurrentSetupPassword }
         }
-
         Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Setup Password",$NewSetupPassword,$CurrentSetupPassword)).Return
     }
 }
@@ -450,8 +442,8 @@ function Invoke-HpTpm
     }
     Process
     {
-        $hpBios = Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
-        $hpBiosSettings = Get-WmiObject -Class HPBIOS_BIOSSettingInterface -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction stop
+        $hpBios=Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
+        $hpBiosSettings=Get-WmiObject -Class HPBIOS_BIOSSettingInterface -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction stop
         
         if (($hpBios | Where-Object { $_.Name -eq "Setup Password" }).SupportedEncoding -eq "kbd")
         {

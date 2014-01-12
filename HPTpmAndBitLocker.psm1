@@ -43,7 +43,7 @@ function Out-HpVerboseReturnValues
 .DESCRIPTION
     Converts UTF16 string to Keyboard Scan Hex Value (KBD).  Older HP BIOS's only accept this encoding method for setup passwords, usful for WMI BIOS Administration.
 .EXAMPLE
-    Convert-ToKbdString -UTF16String "MyStringToConvert"
+    Convert-ToKbdString -UnicodeString "MyStringToConvert"
 .LINKS
     https://github.com/necromorph1024/HPTpmAndBitLocker
     http://www.codeproject.com/Articles/7305/Keyboard-Events-Simulation-using-keybd_event-funct
@@ -60,7 +60,7 @@ function Convert-ToKbdString
         [Parameter(Mandatory=$true,
                    Position=0)]
         [string]
-        $UTF16String
+        $UnicodeString
     )
     $kbdHexVals=New-Object System.Collections.Hashtable
 
@@ -160,7 +160,7 @@ function Convert-ToKbdString
     $kbdHexVals."?"="B5"
 
     $kbdEncodedString=""
-    foreach ($char in $UTF16String.ToCharArray())
+    foreach ($char in $UnicodeString.ToCharArray())
     {
         $kbdEncodedString+=$kbdHexVals.Get_Item($char.ToString())
     }
@@ -200,7 +200,7 @@ function Get-HpSetupPasswordIsSet
 
         try
         {
-            $manufacturer = Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop
+            $manufacturer=Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop
             if ($manufacturer.Manufacturer -ne "Hewlett-Packard")
             {
                 throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used on Hewlett-Packard systems."
@@ -213,9 +213,9 @@ function Get-HpSetupPasswordIsSet
     }
     Process
     {
-        $hpBios = Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
+        $hpBios=Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
 
-        if (($hpBios | Where-Object { $_.Name -eq 'Setup Password'}).IsSet -eq 0)
+        if (($hpBios | Where-Object { $_.Name -eq 'Setup Password' }).IsSet -eq 0)
         {
             return $false
         }
@@ -259,7 +259,7 @@ function Set-HpSetupPassword
         [string]
         $NewSetupPassword,
 
-        # CurrentSetupPassword, Type string, The value of the current setup password.  If no set password, use space surrounded by double quotes, IE: " ".
+        # CurrentSetupPassword, Type string, The value of the current setup password.
         [Parameter(Mandatory=$false,
                    Position=2)]
         [string]
@@ -275,7 +275,7 @@ function Set-HpSetupPassword
 
         try
         {
-            $manufacturer = Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop
+            $manufacturer=Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop
             if ($manufacturer.Manufacturer -ne "Hewlett-Packard")
             {
                 throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used on Hewlett-Packard systems."
@@ -301,8 +301,16 @@ function Set-HpSetupPassword
 
         switch (($hpBios | Where-Object { $_.Name -eq "Setup Password" }).SupportedEncoding)
         {
-            "kbd"{ $NewSetupPassword="<kbd/>"+(Convert-ToKbdString -UTF16String $NewSetupPassword); $CurrentSetupPassword="<kbd/>"+(Convert-ToKbdString -UTF16String $CurrentSetupPassword) }
-            "utf-16"{ $NewSetupPassword="<utf-16/>"+$NewSetupPassword; $CurrentSetupPassword="<utf-16/>"+$CurrentSetupPassword }
+            "kbd"
+            { 
+                $NewSetupPassword="<kbd/>"+(Convert-ToKbdString -UnicodeString $NewSetupPassword) 
+                $CurrentSetupPassword="<kbd/>"+(Convert-ToKbdString -UnicodeString $CurrentSetupPassword) 
+            }
+            "utf-16"
+            { 
+                $NewSetupPassword="<utf-16/>"+$NewSetupPassword 
+                $CurrentSetupPassword="<utf-16/>"+$CurrentSetupPassword 
+            }
         }
         Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Setup Password",$NewSetupPassword,$CurrentSetupPassword)).Return
     }
@@ -445,9 +453,10 @@ function Invoke-HpTpm
         $hpBios=Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
         $hpBiosSettings=Get-WmiObject -Class HPBIOS_BIOSSettingInterface -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction stop
         
-        if (($hpBios | Where-Object { $_.Name -eq "Setup Password" }).SupportedEncoding -eq "kbd")
+        switch (($hpBios | Where-Object { $_.Name -eq "Setup Password" }).SupportedEncoding)
         {
-            $SetupPassword="<kbd/>"+(Convert-ToKbdString -UTF16String $SetupPassword)
+            "kbd"    { $SetupPassword="<kbd/>"+(Convert-ToKbdString -UnicodeString $SetupPassword) }
+            "utf-16" { $SetupPassword="<utf-16/>"+$SetupPassword }
         }
 
         Write-Host "Enabling the Trusted Platform Module..."
@@ -520,7 +529,7 @@ function Invoke-HpTpm
     Get-BitLockerStatus -ComputerName "mycomputer.mydomain.com" -DriveLetter C: -Verbose
 .NOTES
     If no drive letter is specified, the default system drive will be used.
-    The drive letter must be followed with a double colon ":".
+    The drive letter must be followed with a double colon.  IE: "C:".
     Use the -Verbose switch for user friendly STDOUT.
 .LINKS
     https://github.com/necromorph1024/HPTpmAndBitLocker
@@ -711,7 +720,7 @@ function Invoke-BitLockerWithTpmAndNumricalKeyProtectors
                 }
                 catch 
                 {
-                    throw "There was an error backing up the information to AD DS, ensure the proper infrustructer settings are inplace to use this option."
+                    throw "There was an error backing up the information to AD DS, ensure the proper infrastructure settings are inplace to use this option."
                 }
             }
         }

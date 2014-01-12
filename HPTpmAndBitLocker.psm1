@@ -4,14 +4,14 @@
 .DESCRIPTION
     Converts the return values from the .SetBIOSSetting() method to user firendly verbose output.
 .EXAMPLE
-    Out-HPVerboseReturnValues -WmiMethodReturnValue 0
+    Out-HpVerboseReturnValues -WmiMethodReturnValue 0
 .EXAMPLE
-    Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Setup Password"," ",$SetupPassword))
+    Out-HpVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Setup Password"," ",$SetupPassword))
 .LINKS
     https://github.com/necromorph1024/HPTpmAndBitLocker
     http://h20331.www2.hp.com/Hpsub/downloads/cmi_whitepaper.pdf  Page: 14
 #>
-function Out-HPVerboseReturnValues
+function Out-HpVerboseReturnValues
 {
     [CmdletBinding()]
     [OutputType([string])]

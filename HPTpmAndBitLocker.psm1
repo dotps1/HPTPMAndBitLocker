@@ -588,14 +588,15 @@ function Get-BitLockerStatus
 
         if ($VerbosePreference -eq "Continue") 
         {
-            switch ($status=$volume.GetConversionStatus().ConversionStatus) 
+            $status=$volume.GetConversionStatus()
+            switch ($status.ConversionStatus) 
             {
                 0 { Write-Host "FullyDecrypted" }
                 1 { Write-Host "FullyEncrypted" }
-                2 { Write-Host "EncryptionInProgress"; Write-Host "Precentage: " $status.EncryptionPercentage }
-                3 { Write-Host "DecryptionInProgress"; Write-Host "Precentage: " $status.EncryptionPercentage  }
-                4 { Write-Host "EncryptionPaused"; Write-Host "Precentage: " $status.EncryptionPercentage  }
-                5 { Write-Host "DecryptionPaused"; Write-Host "Precentage: " $status.EncryptionPercentage  }
+                2 { Write-Host "EncryptionInProgress"; Write-Host "Precentage: "$status.EncryptionPercentage }
+                3 { Write-Host "DecryptionInProgress"; Write-Host "Precentage: "$status.EncryptionPercentage  }
+                4 { Write-Host "EncryptionPaused"; Write-Host "Precentage: "$status.EncryptionPercentage  }
+                5 { Write-Host "DecryptionPaused"; Write-Host "Precentage: "$status.EncryptionPercentage  }
             }
         }
         
@@ -682,7 +683,7 @@ function Invoke-BitLockerWithTpmAndNumricalKeyProtectors
             {
                 $random+=$charArray | Get-Random
             }
-            $tpm.TakeOwnership($tpm.ConvertToOwnerAuth($random).OwnerAuth)
+            $tpm.TakeOwnership($tpm.ConvertToOwnerAuth($random).OwnerAuth) | Out-Null
         }
 
         if (-not($DriveLetter)) 

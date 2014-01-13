@@ -462,6 +462,10 @@ function Invoke-HpTpm
         {
             Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Device","Device available",$SetupPassword)).Return
         }
+        elseif (($hpBios | Where-Object { $_.Name -eq "Embedded Security Device Availability" }) -ne $null)
+        {
+            Out-HpVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Device Availability","Available",$SetupPassword)).Return
+        }
         elseif (($hpBios | Where-Object { $_.Name -eq "TPM Device" }) -ne $null)
         {
             Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("TPM Device","Available",$SetupPassword)).Return
@@ -584,14 +588,14 @@ function Get-BitLockerStatus
 
         if ($VerbosePreference -eq "Continue") 
         {
-            switch ($volume.GetConversionStatus().ConversionStatus) 
+            switch ($status=$volume.GetConversionStatus().ConversionStatus) 
             {
                 0 { Write-Host "FullyDecrypted" }
                 1 { Write-Host "FullyEncrypted" }
-                2 { Write-Host "EncryptionInProgress" }
-                3 { Write-Host "DecryptionInProgress" }
-                4 { Write-Host "EncryptionPaused" }
-                5 { Write-Host "DecryptionPaused" }
+                2 { Write-Host "EncryptionInProgress"; Write-Host "Precentage: " $status.EncryptionPercentage }
+                3 { Write-Host "DecryptionInProgress"; Write-Host "Precentage: " $status.EncryptionPercentage  }
+                4 { Write-Host "EncryptionPaused"; Write-Host "Precentage: " $status.EncryptionPercentage  }
+                5 { Write-Host "DecryptionPaused"; Write-Host "Precentage: " $status.EncryptionPercentage  }
             }
         }
         

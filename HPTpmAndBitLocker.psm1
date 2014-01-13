@@ -593,14 +593,14 @@ function Get-BitLockerStatus
             {
                 0 { Write-Host "FullyDecrypted" }
                 1 { Write-Host "FullyEncrypted" }
-                2 { Write-Host "EncryptionInProgress"; Write-Host "Precentage: "$status.EncryptionPercentage }
-                3 { Write-Host "DecryptionInProgress"; Write-Host "Precentage: "$status.EncryptionPercentage  }
-                4 { Write-Host "EncryptionPaused"; Write-Host "Precentage: "$status.EncryptionPercentage  }
-                5 { Write-Host "DecryptionPaused"; Write-Host "Precentage: "$status.EncryptionPercentage  }
+                2 { Write-Host "EncryptionInProgress"; Write-Host "Precentage:"$status.EncryptionPercentage }
+                3 { Write-Host "DecryptionInProgress"; Write-Host "Precentage:"$status.EncryptionPercentage  }
+                4 { Write-Host "EncryptionPaused"; Write-Host "Precentage:"$status.EncryptionPercentage  }
+                5 { Write-Host "DecryptionPaused"; Write-Host "Precentage:"$status.EncryptionPercentage  }
             }
         }
         
-        if ($status.ProtectionStatus -eq 0) 
+        if ($volume.GetProtectionStatus().ProtectionStatus -eq 0) 
         {
             if ($VerbosePreference -eq "Continue") 
             {

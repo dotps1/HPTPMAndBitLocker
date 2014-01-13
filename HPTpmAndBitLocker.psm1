@@ -195,7 +195,7 @@ function Get-HpSetupPasswordIsSet
     {
         if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
         {
-            Write-Error "Unable to connect to $ComputerName.  Please ensure the system is available."
+            throw "Unable to connect to $ComputerName.  Please ensure the system is available."
         }
 
         try
@@ -348,8 +348,7 @@ function Get-TpmStatus
     {
         if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
         {
-            Write-Error "Unable to connect to $ComputerName.  Please ensure the system is available."
-            return $false
+            throw "Unable to connect to $ComputerName.  Please ensure the system is available."
         }
     }
     Process
@@ -360,8 +359,7 @@ function Get-TpmStatus
         }
         catch 
         {
-            Write-Error "Unable to connect to the Win32_Tpm Namespace, You may not have sufficent rights."
-            return $false
+            throw "Unable to connect to the Win32_Tpm Namespace, You may not have sufficent rights."
         }
 
         if (-not($tpm.IsEnabled_InitialValue)) 
@@ -558,8 +556,7 @@ function Get-BitLockerStatus
     {
         if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
         {
-            Write-Error "Unable to connect to $ComputerName.  Please ensure the system is available."
-            return $false
+            throw "Unable to connect to $ComputerName.  Please ensure the system is available."
         }
     }
     Process
@@ -573,8 +570,7 @@ function Get-BitLockerStatus
             }
             catch 
             {
-                Write-Error "Unable to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the Win32_OperatingSystem and Win32_EncryptableVolume Namespaces."
-                return $false
+                throw "Unable to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the Win32_OperatingSystem and Win32_EncryptableVolume Namespaces."
             }
         }
         else 
@@ -582,8 +578,7 @@ function Get-BitLockerStatus
             $volume=Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
             if ($volume -eq $null) 
             {
-                Write-Error "Unable to enumarate the Win32_EncryptableVolume Namespace for $DriveLetter.  Please make sure the drive letter is correct and that the volume is accessable."
-                return $false
+                throw "Unable to enumarate the Win32_EncryptableVolume Namespace for $DriveLetter.  Please make sure the drive letter is correct and that the volume is accessable."
             }
         }
 
@@ -695,8 +690,7 @@ function Invoke-BitLockerWithTpmAndNumricalKeyProtectors
             }
             catch 
             {
-                Write-Error "Unable to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the Win32_OperatingSystem and Win32_EncryptableVolume Namespaces."
-                return $false
+                throw "Unable to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the Win32_OperatingSystem and Win32_EncryptableVolume Namespaces."
             }
         }
         else 
@@ -704,8 +698,7 @@ function Invoke-BitLockerWithTpmAndNumricalKeyProtectors
             $volume=Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
             if ($volume -eq $null) 
             {
-                Write-Error "Unable to enumarate the Win32_EncryptableVolume Namespace for $DriveLetter.  Please make sure the drive letter is correct and that the volume is accessable."
-                return $false
+                throw "Unable to enumarate the Win32_EncryptableVolume Namespace for $DriveLetter.  Please make sure the drive letter is correct and that the volume is accessable."
             }
         }
 

@@ -600,7 +600,7 @@ function Get-BitLockerStatus
             }
         }
         
-        if ($volume.GetProtectionStatus().ProtectionStatus -eq 0) 
+        if ($status.ProtectionStatus -eq 0) 
         {
             if ($VerbosePreference -eq "Continue") 
             {

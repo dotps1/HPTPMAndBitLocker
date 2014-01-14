@@ -201,7 +201,7 @@ function Get-HpSetupPasswordIsSet
         try
         {
             $manufacturer=Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop
-            if ($manufacturer.Manufacturer -ne "Hewlett-Packard")
+            if (($manufacturer.Manufacturer -ne "Hewlett-Packard") -or ($manufacturer.Manufacturer -ne "HP"))
             {
                 throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used on Hewlett-Packard systems."
             }
@@ -276,7 +276,7 @@ function Set-HpSetupPassword
         try
         {
             $manufacturer=Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop
-            if ($manufacturer.Manufacturer -ne "Hewlett-Packard")
+            if (($manufacturer.Manufacturer -ne "Hewlett-Packard") -or ($manufacturer.Manufacturer -ne "HP"))
             {
                 throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used on Hewlett-Packard systems."
             }
@@ -515,7 +515,7 @@ function Invoke-HpTpm
     {
         if ($RestartComputer)
         {
-            Restart-Computer -ComputerName $ComputerName -Delay $RestartDelay -force
+            Restart-Computer -ComputerName $ComputerName -Delay $RestartDelay -Force -Wait
         }
     }
 }

@@ -731,7 +731,7 @@ function Invoke-BitLockerWithTpmAndNumricalKeyProtectors
         {
             0 { $volume.Encrypt() | Out-Null }
             1 { if ($volume.ProtectionStatus -eq 0) { $volume.EnableKeyProtectors() | Out-Null } }
-            4 { $volume.ResumeConversion() | 0ut-Null }
+            4 { $volume.Encrypt() | Out-Null }
         }
     }
     End

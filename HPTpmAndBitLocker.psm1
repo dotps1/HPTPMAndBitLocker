@@ -188,6 +188,7 @@ function Get-HpSetupPasswordIsSet
         # ComputerName, Type string, System to evaluate Setup Password state against.
         [Parameter(Mandatory=$false,
                    Position=0)]
+        [string]
         $ComputerName=$env:COMPUTERNAME
     )
 
@@ -201,7 +202,7 @@ function Get-HpSetupPasswordIsSet
         try
         {
             $manufacturer=Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop
-            if (($manufacturer.Manufacturer -ne "Hewlett-Packard") -or ($manufacturer.Manufacturer -ne "HP"))
+            if (-not($manufacturer.Manufacturer -eq "Hewlett-Packard" -or $manufacturer.Manufacturer -eq "HP"))
             {
                 throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used on Hewlett-Packard systems."
             }
@@ -215,7 +216,7 @@ function Get-HpSetupPasswordIsSet
     {
         $hpBios=Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
 
-        if (($hpBios | Where-Object { $_.Name -eq 'Setup Password' }).IsSet -eq 0)
+        if (($hpBios | ?{ $_.Name -eq 'Setup Password' }).IsSet -eq 0)
         {
             return $false
         }
@@ -268,7 +269,7 @@ function Set-HpSetupPassword
 
     Begin
     {
-        if (!(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
+        if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
         {
             throw "Unable to connect to $ComputerName.  Please ensure the system is available."
         }
@@ -276,7 +277,7 @@ function Set-HpSetupPassword
         try
         {
             $manufacturer=Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop
-            if (($manufacturer.Manufacturer -ne "Hewlett-Packard") -or ($manufacturer.Manufacturer -ne "HP"))
+            if (-not($manufacturer.Manufacturer -eq "Hewlett-Packard" -or $manufacturer.Manufacturer -eq "HP"))
             {
                 throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used on Hewlett-Packard systems."
             }
@@ -299,7 +300,7 @@ function Set-HpSetupPassword
         $hpBios=Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
         $hpBiosSettings=Get-WmiObject -Class HPBIOS_BIOSSettingInterface -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction stop
 
-        switch (($hpBios | Where-Object { $_.Name -eq "Setup Password" }).SupportedEncoding)
+        switch (($hpBios | ?{ $_.Name -eq "Setup Password" }).SupportedEncoding)
         {
             "kbd"
             { 
@@ -451,62 +452,62 @@ function Invoke-HpTpm
         $hpBios=Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
         $hpBiosSettings=Get-WmiObject -Class HPBIOS_BIOSSettingInterface -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction stop
         
-        switch (($hpBios | Where-Object { $_.Name -eq "Setup Password" }).SupportedEncoding)
+        switch (($hpBios | ?{ $_.Name -eq "Setup Password" }).SupportedEncoding)
         {
             "kbd"    { $SetupPassword="<kbd/>"+(Convert-ToKbdString -UnicodeString $SetupPassword) }
             "utf-16" { $SetupPassword="<utf-16/>"+$SetupPassword }
         }
 
         Write-Host "Enabling the Trusted Platform Module..."
-        if (($hpBios | Where-Object { $_.Name -eq "Embedded Security Device" }) -ne $null)
+        if (($hpBios | ?{ $_.Name -eq "Embedded Security Device" }) -ne $null)
         {
             Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Device","Device available",$SetupPassword)).Return
         }
-        elseif (($hpBios | Where-Object { $_.Name -eq "Embedded Security Device Availability" }) -ne $null)
+        elseif (($hpBios | ?{ $_.Name -eq "Embedded Security Device Availability" }) -ne $null)
         {
             Out-HpVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Device Availability","Available",$SetupPassword)).Return
         }
-        elseif (($hpBios | Where-Object { $_.Name -eq "TPM Device" }) -ne $null)
+        elseif (($hpBios | ?{ $_.Name -eq "TPM Device" }) -ne $null)
         {
             Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("TPM Device","Available",$SetupPassword)).Return
         }
 
         Write-Host "Activating the Trusted Platform Module..."
-        if (($hpBios | Where-Object { $_.Name -eq "Activate Embedded Security On Next Boot" }) -ne $null)
+        if (($hpBios | ?{ $_.Name -eq "Activate Embedded Security On Next Boot" }) -ne $null)
         {
             Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Activate Embedded Security On Next Boot","Enable",$SetupPassword)).Return
         }
-        elseif (($hpBios | Where-Object { $_.Name -eq "Activate TPM On Next Boot" }) -ne $null)
+        elseif (($hpBios | ?{ $_.Name -eq "Activate TPM On Next Boot" }) -ne $null)
         {
             Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Activate TPM On Next Boot","Enable",$SetupPassword)).Return
         }
 
         Write-Host "Setting Trusted Platform Module Activation Policy..."
-        if (($hpBios | Where-Object { $_.Name -eq "Embedded Security Activation Policy" }) -ne $null )
+        if (($hpBios | ?{ $_.Name -eq "Embedded Security Activation Policy" }) -ne $null )
         {
             Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Activation Policy","No prompts",$SetupPassword)).Return
         } 
-        elseif (($hpBios | Where-Object { $_.Name -eq "TPM Activation Policy" }) -ne $null)
+        elseif (($hpBios | ?{ $_.Name -eq "TPM Activation Policy" }) -ne $null)
         {
             Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("TPM Activation Policy","No prompts",$SetupPassword)).Return
         }
 
         Write-Host "Setting Operating System Management of Trusted Platform Module..."
-        if (($hpBios | Where-Object { $_.Name -eq "OS management of Embedded Security Device" }) -ne $null)
+        if (($hpBios | ?{ $_.Name -eq "OS management of Embedded Security Device" }) -ne $null)
         {
             Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("OS management of Embedded Security Device","Enable",$SetupPassword)).Return
         }
-        elseif (($hpBios | Where-Object { $_.Name -eq "OS Management of TPM" }) -ne $null)
+        elseif (($hpBios | ?{ $_.Name -eq "OS Management of TPM" }) -ne $null)
         {
             Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("OS Management of TPM","Enable",$SetupPassword)).Return
         }
 
         Write-Host "Setting Reset Capabilites of Trusted Platform Module for Operating System..."
-        if (($hpBios | Where-Object { $_.Name -eq "Reset of Embedded Security Device through OS" }) -ne $null)
+        if (($hpBios | ?{ $_.Name -eq "Reset of Embedded Security Device through OS" }) -ne $null)
         {
             Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Reset of Embedded Security Device through OS","Enable",$SetupPassword)).Return
         }
-        elseif (($hpBios | Where-Object { $_.Name -eq "Reset of TPM from OS" }) -ne $null)
+        elseif (($hpBios | ?{ $_.Name -eq "Reset of TPM from OS" }) -ne $null)
         {
             Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Reset of TPM from OS","Enable",$SetupPassword)).Return
         }

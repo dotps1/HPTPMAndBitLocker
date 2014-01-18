@@ -312,6 +312,7 @@ function Set-HpSetupPassword
                 $NewSetupPassword="<utf-16/>"+$NewSetupPassword 
                 $CurrentSetupPassword="<utf-16/>"+$CurrentSetupPassword 
             }
+            defualt  { throw "Current setup password encoding unknown, exiting." }
         }
         Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Setup Password",$NewSetupPassword,$CurrentSetupPassword)).Return
     }
@@ -456,6 +457,7 @@ function Invoke-HpTpm
         {
             "kbd"    { $SetupPassword="<kbd/>"+(Convert-ToKbdString -UnicodeString $SetupPassword) }
             "utf-16" { $SetupPassword="<utf-16/>"+$SetupPassword }
+            defualt  { throw "Setup password encoding unknown, exiting." }
         }
 
         Write-Host "Enabling the Trusted Platform Module..."

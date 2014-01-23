@@ -59,6 +59,7 @@ function Convert-ToKbdString
         # Input, Type string, String to be encoded with EN Keyboard Scan Code Hex Values.
         [Parameter(Mandatory=$true,
                    Position=0)]
+        [AllowEmptyString()]
         [string]
         $UnicodeString
     )
@@ -314,6 +315,7 @@ function Set-HpSetupPassword
             }
             defualt  { throw "Current setup password encoding unknown, exiting." }
         }
+        Write-Host "Setting Password..."
         Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Setup Password",$NewSetupPassword,$CurrentSetupPassword)).Return
     }
 }

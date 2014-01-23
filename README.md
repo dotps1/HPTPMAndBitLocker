@@ -34,7 +34,7 @@ If there is a known current password, it can be provided at the top of the scrip
 			Set-HpSetupPassword -NewSetupPassword " " -CurrentSetupPassword $password
 		}
 		
-		Restart-Computer -Delay 30 -Force -Wait 
+		Restart-Computer -Force
 	}
 	elseif (-not(Get-BitLockerStatus))
 	{

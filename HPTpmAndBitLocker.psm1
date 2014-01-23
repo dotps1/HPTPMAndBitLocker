@@ -556,7 +556,8 @@ function Get-BitLockerStatus
         [Parameter(Mandatory=$false,
                    Position=1)]
         [ValidatePattern('[a-zA-Z]:')]
-        [string]$DriveLetter
+        [string]
+        $DriveLetter
     )
 
     Begin

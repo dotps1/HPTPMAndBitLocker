@@ -1,6 +1,6 @@
 ###*THIS MODULE HAS THE ABILITY TO MODIFY BIOS SETTINGS USE AT YOUR OWN RISK*###
 
-#**Highly customized BitLocker PowerShell Module for TPM Administration and BitLocker Administration for HP Workstations.**#
+**Highly customized BitLocker PowerShell Module for TPM Administration and BitLocker Administration for HP Workstations.**
 
 I have found the "MangeBde.exe" CLI tool a little cumbersome, so I am developing a "More Powerful" BitLocker Module.
 Also, the BiosConfigurationUtility from HP is even more cumbersome, with the verbiage being slightly different between models, i need model specific configuration files for every pc I manage.  And a single command cannot be passed to that utility which is ridiculous, so this is a "One Stop Shop" for those tasks.

@@ -19,7 +19,7 @@ if (-not(Get-TpmStatus))
 		Set-HpSetupPassword -NewSetupPassword " " -CurrentSetupPassword $password
 	}
 		
-	Restart-Computer
+	Restart-Computer -Force
 }
 elseif (-not(Get-BitLockerStatus))
 {

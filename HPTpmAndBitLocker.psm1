@@ -520,7 +520,7 @@ function Invoke-HpTpm
     {
         if ($RestartComputer)
         {
-            Restart-Computer -ComputerName $ComputerName -Delay $RestartDelay -Force -Wait
+            shutdown.exe -f -r -t $RestartDelay -m $ComputerName -c "A reboot is required to complete the invocation of the Tpm."
         }
     }
 }

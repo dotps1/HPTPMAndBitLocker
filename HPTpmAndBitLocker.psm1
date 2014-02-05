@@ -415,11 +415,11 @@ function Invoke-HpTpm
         [string]
         $ComputerName=$env:ComputerName,
 
-        # CurrentPassword, Type string, The current Setup Password of the system Bios.
+        # Password, Type string, The current Setup Password of the system Bios.
         [Parameter(Mandatory=$true,
                    Position=1)]
         [string]
-        $CurrentPassword,
+        $Password,
 
         # RestartComputer, Type switch, Boolean value that determines to reboot the pc.
         [Parameter(ParameterSetName="Overload")]
@@ -444,63 +444,63 @@ function Invoke-HpTpm
         
     switch (($hpBios | ?{ $_.Name -eq "Setup Password" }).SupportedEncoding)
     {
-        "kbd"    { $CurrentSetupPassword="<kbd/>"+(Convert-ToKbdString -UnicodeString $CurrentPassword) }
-        "utf-16" { $CurrentSetupPassword="<utf-16/>"+$CurrentPassword }
+        "kbd"    { $SetupPassword="<kbd/>"+(Convert-ToKbdString -UnicodeString $Password) }
+        "utf-16" { $SetupPassword="<utf-16/>"+$Password }
         defualt  { throw "Setup password encoding unknown, exiting." }
     }
 
     Write-Host "Enabling the Trusted Platform Module..."
     if (($hpBios | ?{ $_.Name -eq "Embedded Security Device" }) -ne $null)
     {
-        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Device","Device available",$CurrentSetupPassword)).Return
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Device","Device available",$SetupPassword)).Return
     }
     elseif (($hpBios | ?{ $_.Name -eq "Embedded Security Device Availability" }) -ne $null)
     {
-        Out-HpVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Device Availability","Available",$CurrentSetupPassword)).Return
+        Out-HpVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Device Availability","Available",$SetupPassword)).Return
     }
     elseif (($hpBios | ?{ $_.Name -eq "TPM Device" }) -ne $null)
     {
-        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("TPM Device","Available",$CurrentSetupPassword)).Return
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("TPM Device","Available",$SetupPassword)).Return
     }
 
     Write-Host "Activating the Trusted Platform Module..."
     if (($hpBios | ?{ $_.Name -eq "Activate Embedded Security On Next Boot" }) -ne $null)
     {
-        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Activate Embedded Security On Next Boot","Enable",$CurrentSetupPassword)).Return
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Activate Embedded Security On Next Boot","Enable",$SetupPassword)).Return
     }
     elseif (($hpBios | ?{ $_.Name -eq "Activate TPM On Next Boot" }) -ne $null)
     {
-        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Activate TPM On Next Boot","Enable",$CurrentSetupPassword)).Return
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Activate TPM On Next Boot","Enable",$SetupPassword)).Return
     }
 
     Write-Host "Setting Trusted Platform Module Activation Policy..."
     if (($hpBios | ?{ $_.Name -eq "Embedded Security Activation Policy" }) -ne $null )
     {
-        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Activation Policy","No prompts",$CurrentSetupPassword)).Return
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Activation Policy","No prompts",$SetupPassword)).Return
     } 
     elseif (($hpBios | ?{ $_.Name -eq "TPM Activation Policy" }) -ne $null)
     {
-        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("TPM Activation Policy","No prompts",$CurrentSetupPassword)).Return
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("TPM Activation Policy","No prompts",$SetupPassword)).Return
     }
 
     Write-Host "Setting Operating System Management of Trusted Platform Module..."
     if (($hpBios | ?{ $_.Name -eq "OS management of Embedded Security Device" }) -ne $null)
     {
-        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("OS management of Embedded Security Device","Enable",$CurrentSetupPassword)).Return
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("OS management of Embedded Security Device","Enable",$SetupPassword)).Return
     }
     elseif (($hpBios | ?{ $_.Name -eq "OS Management of TPM" }) -ne $null)
     {
-        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("OS Management of TPM","Enable",$CurrentSetupPassword)).Return
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("OS Management of TPM","Enable",$SetupPassword)).Return
     }
 
     Write-Host "Setting Reset Capabilites of Trusted Platform Module for Operating System..."
     if (($hpBios | ?{ $_.Name -eq "Reset of Embedded Security Device through OS" }) -ne $null)
     {
-        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Reset of Embedded Security Device through OS","Enable",$CurrentSetupPassword)).Return
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Reset of Embedded Security Device through OS","Enable",$SetupPassword)).Return
     }
     elseif (($hpBios | ?{ $_.Name -eq "Reset of TPM from OS" }) -ne $null)
     {
-        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Reset of TPM from OS","Enable",$CurrentSetupPassword)).Return
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Reset of TPM from OS","Enable",$SetupPassword)).Return
     }
 
     if ($RestartComputer)

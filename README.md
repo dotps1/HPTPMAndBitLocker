@@ -26,14 +26,14 @@ If there is a known current password, it can be provided at the top of the scrip
 	{
 		if(-not(Get-HpSetupPasswordIsSet))
 		{
-			$password=powershell ". .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"
+			$password=PowerShell ". .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"
 			$randomPasswordUsed=$true
-			Set-HpSetupPassword -NewSetupPassword $password
+			Set-HpSetupPassword -NewPassword $password
 		}
-		Invoke-HpTpm -SetupPassword $password
+		Invoke-HpTpm -Password $password
 		if ($randomPasswordUsed)
 		{
-			Set-HpSetupPassword -NewSetupPassword " " -CurrentSetupPassword $password
+			Set-HpSetupPassword -NewPassword " " -CurrentPassword $password
 		}
 		
 		Restart-Computer -Force

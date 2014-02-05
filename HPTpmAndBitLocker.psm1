@@ -19,7 +19,9 @@ function Out-HpVerboseReturnValues
     (
         # WmiMethodReturnValue, Type int, The Return Property Value to be converted to verbose output.
         [Parameter(Mandatory=$true,
-                   Position=0)]
+                   Position=0,
+                   ValueFromPipeline=$true)]
+        [Alias("RetVal")]
         [int]
         $WmiMethodReturnValue
     )
@@ -58,11 +60,14 @@ function Convert-ToKbdString
     (
         # Input, Type string, String to be encoded with EN Keyboard Scan Code Hex Values.
         [Parameter(Mandatory=$true,
-                   Position=0)]
+                   Position=0,
+                   ValueFromPipeline=$true)]
+        [Alias("UniStr")]
         [AllowEmptyString()]
         [string]
         $UnicodeString
     )
+
     $kbdHexVals=New-Object System.Collections.Hashtable
 
     $kbdHexVals."a"="1E"
@@ -187,44 +192,39 @@ function Get-HpSetupPasswordIsSet
     Param
     (
         # ComputerName, Type string, System to evaluate Setup Password state against.
-        [Parameter(Mandatory=$false,
-                   Position=0)]
-        [string]
+        [Parameter(Position=0,
+                   ValueFromPipeline=$true)]
+        [string[]]
         $ComputerName=$env:COMPUTERNAME
     )
 
-    Begin
+    if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
     {
-        if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
-        {
-            throw "Unable to connect to $ComputerName.  Please ensure the system is available."
-        }
+        throw "Unable to connect to $ComputerName.  Please ensure the system is available."
+    }
 
-        try
+    try
+    {
+        $manufacturer=Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop
+        if (-not($manufacturer.Manufacturer -eq "Hewlett-Packard" -or $manufacturer.Manufacturer -eq "HP"))
         {
-            $manufacturer=Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop
-            if (-not($manufacturer.Manufacturer -eq "Hewlett-Packard" -or $manufacturer.Manufacturer -eq "HP"))
-            {
-                throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used on Hewlett-Packard systems."
-            }
-        }
-        catch
-        {
-            throw "Unable to connect to the Win32_ComputerSystem WMI Namespace, verify the system is avaialbe and you have the permissions to access the namespace."
+            throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used on Hewlett-Packard systems."
         }
     }
-    Process
+    catch
     {
-        $hpBios=Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
+        throw "Unable to connect to the Win32_ComputerSystem WMI Namespace, verify the system is avaialbe and you have the permissions to access the namespace."
+    }
 
-        if (($hpBios | ?{ $_.Name -eq 'Setup Password' }).IsSet -eq 0)
-        {
-            return $false
-        }
-        else
-        {
-            return $true
-        }
+    $hpBios=Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
+
+    if (($hpBios | ?{ $_.Name -eq 'Setup Password' }).IsSet -eq 0)
+    {
+        return $false
+    }
+    else
+    {
+        return $true
     }
 }
 
@@ -250,74 +250,69 @@ function Set-HpSetupPassword
     Param
     (
         # ComputerName, Type string, System to set Bios Setup Password.
-        [Parameter(Mandatory=$false,
-                   Position=0)]
-        [string]
+        [Parameter(Position=0,
+                   ValueFromPipeline=$true)]
+        [string[]]
         $ComputerName=$env:COMPUTERNAME,
 
-        # NewSetupPassword, Type string, The value of the password to be set.  The password can be cleared by using a space surrounded by double quotes, IE: " ".
+        # NewPassword, Type string, The value of the password to be set.  The password can be cleared by using a space surrounded by double quotes, IE: " ".
         [Parameter(Mandatory=$true,
                    Position=1)]
         [string]
-        $NewSetupPassword,
+        $NewPassword,
 
-        # CurrentSetupPassword, Type string, The value of the current setup password.
-        [Parameter(Mandatory=$false,
-                   Position=2)]
+        # CurrentPassword, Type string, The value of the current setup password.
+        [Parameter(Position=2)]
         [string]
-        $CurrentSetupPassword
+        $CurrentPassword
     )
 
-    Begin
+    if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
     {
-        if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
-        {
-            throw "Unable to connect to $ComputerName.  Please ensure the system is available."
-        }
+        throw "Unable to connect to $ComputerName.  Please ensure the system is available."
+    }
 
-        try
+    try
+    {
+        $manufacturer=Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop
+        if (-not($manufacturer.Manufacturer -eq "Hewlett-Packard" -or $manufacturer.Manufacturer -eq "HP"))
         {
-            $manufacturer=Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop
-            if (-not($manufacturer.Manufacturer -eq "Hewlett-Packard" -or $manufacturer.Manufacturer -eq "HP"))
-            {
-                throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used on Hewlett-Packard systems."
-            }
-        }
-        catch
-        {
-            throw "Unable to connect to the Win32_ComputerSystem WMI Namespace, verify the system is avaialbe and you have the permissions to access the namespace."
+            throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used on Hewlett-Packard systems."
         }
     }
-    Process
+    catch
     {
-        if (-not([String]::IsNullOrWhiteSpace($NewSetupPassword)))
-        {
-            if (($NewSetupPassword.Length -lt 8) -or ($NewSetupPassword.Length -gt 30))
-            {
-                throw "The Password Values must be be between 8 and 30 characters if not clearing the password."
-            }
-        }
-
-        $hpBios=Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
-        $hpBiosSettings=Get-WmiObject -Class HPBIOS_BIOSSettingInterface -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction stop
-
-        switch (($hpBios | ?{ $_.Name -eq "Setup Password" }).SupportedEncoding)
-        {
-            "kbd"
-            { 
-                $NewSetupPassword="<kbd/>"+(Convert-ToKbdString -UnicodeString $NewSetupPassword) 
-                $CurrentSetupPassword="<kbd/>"+(Convert-ToKbdString -UnicodeString $CurrentSetupPassword) 
-            }
-            "utf-16"
-            { 
-                $NewSetupPassword="<utf-16/>"+$NewSetupPassword 
-                $CurrentSetupPassword="<utf-16/>"+$CurrentSetupPassword 
-            }
-            defualt  { throw "Current setup password encoding unknown, exiting." }
-        }
-        Write-Host "Setting Password..."
-        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Setup Password",$NewSetupPassword,$CurrentSetupPassword)).Return
+        throw "Unable to connect to the Win32_ComputerSystem WMI Namespace, verify the system is avaialbe and you have the permissions to access the namespace."
     }
+
+    if (-not([String]::IsNullOrWhiteSpace($NewPassword)))
+    {
+        if (($NewPassword.Length -lt 8) -or ($NewPassword.Length -gt 30))
+        {
+            throw "The Password Values must be be between 8 and 30 characters if not clearing the password."
+        }
+    }
+
+    $hpBios=Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
+    $hpBiosSettings=Get-WmiObject -Class HPBIOS_BIOSSettingInterface -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction stop
+
+    switch (($hpBios | ?{ $_.Name -eq "Setup Password" }).SupportedEncoding)
+    {
+        "kbd"
+        { 
+            $NewSetupPassword="<kbd/>"+(Convert-ToKbdString -UnicodeString $NewPassword) 
+            $CurrentSetupPassword="<kbd/>"+(Convert-ToKbdString -UnicodeString $CurrentPassword) 
+        }
+        "utf-16"
+        { 
+            $NewSetupPassword="<utf-16/>"+$NewPassword 
+            $CurrentSetupPassword="<utf-16/>"+$CurrentPassword 
+        }
+        defualt  { throw "Current setup password encoding unknown, exiting." }
+    }
+
+    Write-Host "Setting Password..."
+    Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Setup Password",$NewSetupPassword,$CurrentSetupPassword)).Return
 }
 
 <#
@@ -342,57 +337,54 @@ function Get-TpmStatus
     Param 
     (
         # ComputerName, Type string, System to evaluate TPM against.
-        [Parameter(Mandatory=$false,
-                   Position=0)]
-        [string]
+        [Parameter(Position=0,
+                   ValueFromPipeline=$true)]
+        [string[]]
         $ComputerName=$env:COMPUTERNAME
     )
 
-    Begin
+    if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
     {
-        if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
-        {
-            throw "Unable to connect to $ComputerName.  Please ensure the system is available."
-        }
+        throw "Unable to connect to $ComputerName.  Please ensure the system is available."
     }
-    Process
+
+    try 
     {
-        try 
+        $tpm=Get-WmiObject -Class Win32_Tpm -Namespace "root\CIMV2\Security\MicrosoftTpm" -ComputerName $ComputerName -ErrorAction Stop
+    }
+    catch 
+    {
+        throw "Unable to connect to the Win32_Tpm Namespace, You may not have sufficent rights."
+    }
+
+    if (-not($tpm.IsEnabled_InitialValue)) 
+    {
+        if ($VerbosePreference -eq "Continue") 
         {
-            $tpm=Get-WmiObject -Class Win32_Tpm -Namespace "root\CIMV2\Security\MicrosoftTpm" -ComputerName $ComputerName -ErrorAction Stop
-        }
-        catch 
-        {
-            throw "Unable to connect to the Win32_Tpm Namespace, You may not have sufficent rights."
+            Write-Host "TPM is not Enabled."
+            return
         }
 
-        if (-not($tpm.IsEnabled_InitialValue)) 
+        return $false
+    }
+    elseif (-not($tpm.IsActivated_InitialValue)) 
+    {
+        if ($VerbosePreference -eq "Continue") 
         {
-            if ($VerbosePreference -eq "Continue") 
-            {
-                Write-Host "TPM is not Enabled."
-                return
-            }
-            return $false
+            Write-Host "TPM is Enabled, but not Activated."
+            return
         }
-        elseif (-not($tpm.IsActivated_InitialValue)) 
+        return $false
+    }
+    else 
+    {
+        if ($VerbosePreference -eq "Continue") 
         {
-            if ($VerbosePreference -eq "Continue") 
-            {
-                Write-Host "TPM is Enabled, but not Activated."
-                return
-            }
-            return $false
+            Write-Host "TPM is both Enabled and Activated."
+            return
         }
-        else 
-        {
-            if ($VerbosePreference -eq "Continue") 
-            {
-                Write-Host "TPM is both Enabled and Activated."
-                return
-            }
-            return $true
-        }
+
+        return $true
     }
 }
 
@@ -418,24 +410,23 @@ function Invoke-HpTpm
     Param
     (
         # ComputerName, Type string, The HP Computer to enable and configure TPM.
-        [Parameter(Mandatory=$false,
-                   Position=0)]
+        [Parameter(Position=0,
+                   ValueFromPipeline=$true)]
         [string]
         $ComputerName=$env:ComputerName,
 
-        # SetupPassword, Type string, The current Setup Password of the system Bios.
+        # CurrentPassword, Type string, The current Setup Password of the system Bios.
         [Parameter(Mandatory=$true,
                    Position=1)]
         [string]
-        $SetupPassword,
+        $CurrentPassword,
 
         # RestartComputer, Type switch, Boolean value that determines to reboot the pc.
-        [Parameter(ParameterSetName="Overload",
-                   Mandatory=$false)]
+        [Parameter(ParameterSetName="Overload")]
         [switch]
         $RestartComputer,
 
-        # RestartDelay, Type int, The amount of time in seconds before the computer restarts.
+        # RestartDelay, Type int, The amount of time in seconds before the computer restarts, must be specified if the $RestartComputer switch is used.
         [Parameter(ParameterSetName="Overload",
                    Mandatory=$true)]
         [ValidateRange(0,86400)]
@@ -443,85 +434,78 @@ function Invoke-HpTpm
         $RestartDelay
     )
 
-    Begin
+    if (-not(Get-HPSetupPasswordIsSet))
     {
-        if (-not(Get-HPSetupPasswordIsSet))
-        {
-            throw "The Bios Setup Password must be set before this cmdlet can be used."
-        }
+        throw "The Bios Setup Password must be set before this cmdlet can be used."
     }
-    Process
-    {
-        $hpBios=Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
-        $hpBiosSettings=Get-WmiObject -Class HPBIOS_BIOSSettingInterface -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction stop
+
+    $hpBios=Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
+    $hpBiosSettings=Get-WmiObject -Class HPBIOS_BIOSSettingInterface -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction stop
         
-        switch (($hpBios | ?{ $_.Name -eq "Setup Password" }).SupportedEncoding)
-        {
-            "kbd"    { $SetupPassword="<kbd/>"+(Convert-ToKbdString -UnicodeString $SetupPassword) }
-            "utf-16" { $SetupPassword="<utf-16/>"+$SetupPassword }
-            defualt  { throw "Setup password encoding unknown, exiting." }
-        }
-
-        Write-Host "Enabling the Trusted Platform Module..."
-        if (($hpBios | ?{ $_.Name -eq "Embedded Security Device" }) -ne $null)
-        {
-            Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Device","Device available",$SetupPassword)).Return
-        }
-        elseif (($hpBios | ?{ $_.Name -eq "Embedded Security Device Availability" }) -ne $null)
-        {
-            Out-HpVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Device Availability","Available",$SetupPassword)).Return
-        }
-        elseif (($hpBios | ?{ $_.Name -eq "TPM Device" }) -ne $null)
-        {
-            Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("TPM Device","Available",$SetupPassword)).Return
-        }
-
-        Write-Host "Activating the Trusted Platform Module..."
-        if (($hpBios | ?{ $_.Name -eq "Activate Embedded Security On Next Boot" }) -ne $null)
-        {
-            Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Activate Embedded Security On Next Boot","Enable",$SetupPassword)).Return
-        }
-        elseif (($hpBios | ?{ $_.Name -eq "Activate TPM On Next Boot" }) -ne $null)
-        {
-            Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Activate TPM On Next Boot","Enable",$SetupPassword)).Return
-        }
-
-        Write-Host "Setting Trusted Platform Module Activation Policy..."
-        if (($hpBios | ?{ $_.Name -eq "Embedded Security Activation Policy" }) -ne $null )
-        {
-            Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Activation Policy","No prompts",$SetupPassword)).Return
-        } 
-        elseif (($hpBios | ?{ $_.Name -eq "TPM Activation Policy" }) -ne $null)
-        {
-            Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("TPM Activation Policy","No prompts",$SetupPassword)).Return
-        }
-
-        Write-Host "Setting Operating System Management of Trusted Platform Module..."
-        if (($hpBios | ?{ $_.Name -eq "OS management of Embedded Security Device" }) -ne $null)
-        {
-            Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("OS management of Embedded Security Device","Enable",$SetupPassword)).Return
-        }
-        elseif (($hpBios | ?{ $_.Name -eq "OS Management of TPM" }) -ne $null)
-        {
-            Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("OS Management of TPM","Enable",$SetupPassword)).Return
-        }
-
-        Write-Host "Setting Reset Capabilites of Trusted Platform Module for Operating System..."
-        if (($hpBios | ?{ $_.Name -eq "Reset of Embedded Security Device through OS" }) -ne $null)
-        {
-            Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Reset of Embedded Security Device through OS","Enable",$SetupPassword)).Return
-        }
-        elseif (($hpBios | ?{ $_.Name -eq "Reset of TPM from OS" }) -ne $null)
-        {
-            Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Reset of TPM from OS","Enable",$SetupPassword)).Return
-        }
-    }
-    End
+    switch (($hpBios | ?{ $_.Name -eq "Setup Password" }).SupportedEncoding)
     {
-        if ($RestartComputer)
-        {
-            shutdown.exe -f -r -t $RestartDelay -m $ComputerName -c "A reboot is required to complete the invocation of the Tpm."
-        }
+        "kbd"    { $CurrentSetupPassword="<kbd/>"+(Convert-ToKbdString -UnicodeString $CurrentPassword) }
+        "utf-16" { $CurrentSetupPassword="<utf-16/>"+$CurrentPassword }
+        defualt  { throw "Setup password encoding unknown, exiting." }
+    }
+
+    Write-Host "Enabling the Trusted Platform Module..."
+    if (($hpBios | ?{ $_.Name -eq "Embedded Security Device" }) -ne $null)
+    {
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Device","Device available",$CurrentSetupPassword)).Return
+    }
+    elseif (($hpBios | ?{ $_.Name -eq "Embedded Security Device Availability" }) -ne $null)
+    {
+        Out-HpVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Device Availability","Available",$CurrentSetupPassword)).Return
+    }
+    elseif (($hpBios | ?{ $_.Name -eq "TPM Device" }) -ne $null)
+    {
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("TPM Device","Available",$CurrentSetupPassword)).Return
+    }
+
+    Write-Host "Activating the Trusted Platform Module..."
+    if (($hpBios | ?{ $_.Name -eq "Activate Embedded Security On Next Boot" }) -ne $null)
+    {
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Activate Embedded Security On Next Boot","Enable",$CurrentSetupPassword)).Return
+    }
+    elseif (($hpBios | ?{ $_.Name -eq "Activate TPM On Next Boot" }) -ne $null)
+    {
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Activate TPM On Next Boot","Enable",$CurrentSetupPassword)).Return
+    }
+
+    Write-Host "Setting Trusted Platform Module Activation Policy..."
+    if (($hpBios | ?{ $_.Name -eq "Embedded Security Activation Policy" }) -ne $null )
+    {
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Activation Policy","No prompts",$CurrentSetupPassword)).Return
+    } 
+    elseif (($hpBios | ?{ $_.Name -eq "TPM Activation Policy" }) -ne $null)
+    {
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("TPM Activation Policy","No prompts",$CurrentSetupPassword)).Return
+    }
+
+    Write-Host "Setting Operating System Management of Trusted Platform Module..."
+    if (($hpBios | ?{ $_.Name -eq "OS management of Embedded Security Device" }) -ne $null)
+    {
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("OS management of Embedded Security Device","Enable",$CurrentSetupPassword)).Return
+    }
+    elseif (($hpBios | ?{ $_.Name -eq "OS Management of TPM" }) -ne $null)
+    {
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("OS Management of TPM","Enable",$CurrentSetupPassword)).Return
+    }
+
+    Write-Host "Setting Reset Capabilites of Trusted Platform Module for Operating System..."
+    if (($hpBios | ?{ $_.Name -eq "Reset of Embedded Security Device through OS" }) -ne $null)
+    {
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Reset of Embedded Security Device through OS","Enable",$CurrentSetupPassword)).Return
+    }
+    elseif (($hpBios | ?{ $_.Name -eq "Reset of TPM from OS" }) -ne $null)
+    {
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Reset of TPM from OS","Enable",$CurrentSetupPassword)).Return
+    }
+
+    if ($RestartComputer)
+    {
+        shutdown.exe -f -r -t $RestartDelay -m $ComputerName -c "A reboot is required to complete the invocation of the Tpm."
     }
 }
 
@@ -549,81 +533,76 @@ function Get-BitLockerStatus
     Param
     (
         # ComputerName, Type string, System to evaluate BitLocker against.
-        [Parameter(Mandatory=$false,
-                   Position=0)]
-        [string]
+        [Parameter(Position=0,
+                   ValueFromPipeline=$true)]
+        [string[]]
         $ComputerName=$env:COMPUTERNAME,
 
-        # DriveLetter, Type string, Drive letter to evaluate BitLocker against.  if NullOrEmpty the SystemDrive will be used.
-        [Parameter(Mandatory=$false,
-                   Position=1)]
+        # DriveLetter, Type string, Drive letter to evaluate BitLocker against.  if NullOrEmpty the default SystemDrive will be used.
+        [Parameter(Position=1,
+                   HelpMessage="Drive letter format must be letter followed by colon, 'C:'")]
         [ValidatePattern('[a-zA-Z]:')]
         [string]
         $DriveLetter
     )
 
-    Begin
+    if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
     {
-        if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
+        throw "Unable to connect to $ComputerName.  Please ensure the system is available."
+    }
+
+    if (-not($DriveLetter)) 
+    {
+        try 
         {
-            throw "Unable to connect to $ComputerName.  Please ensure the system is available."
+            $drive=Get-WmiObject Win32_OperatingSystem -Namespace "root\CIMV2" -ComputerName $ComputerName -Property SystemDrive -ErrorAction Stop
+            $volume=Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$($drive.SystemDrive)'" -ComputerName $ComputerName -ErrorAction Stop
+        }
+        catch 
+        {
+            throw "Unable to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the Win32_OperatingSystem and Win32_EncryptableVolume Namespaces."
         }
     }
-    Process
+    else 
     {
-        if (-not($DriveLetter)) 
+        $volume=Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
+        if ($volume -eq $null) 
         {
-            try 
-            {
-                $drive=Get-WmiObject Win32_OperatingSystem -Namespace "root\CIMV2" -ComputerName $ComputerName -Property SystemDrive -ErrorAction Stop
-                $volume=Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$($drive.SystemDrive)'" -ComputerName $ComputerName -ErrorAction Stop
-            }
-            catch 
-            {
-                throw "Unable to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the Win32_OperatingSystem and Win32_EncryptableVolume Namespaces."
-            }
+            throw "Unable to enumarate the Win32_EncryptableVolume Namespace for $DriveLetter.  Please make sure the drive letter is correct and that the volume is accessable."
         }
-        else 
-        {
-            $volume=Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
-            if ($volume -eq $null) 
-            {
-                throw "Unable to enumarate the Win32_EncryptableVolume Namespace for $DriveLetter.  Please make sure the drive letter is correct and that the volume is accessable."
-            }
-        }
+    }
 
+    if ($VerbosePreference -eq "Continue") 
+    {
+        $status=$volume.GetConversionStatus()
+        switch ($status.ConversionStatus) 
+        {
+            0 { Write-Host "FullyDecrypted" }
+            1 { Write-Host "FullyEncrypted" }
+            2 { Write-Host "EncryptionInProgress"; Write-Host "Precentage:"$status.EncryptionPercentage }
+            3 { Write-Host "DecryptionInProgress"; Write-Host "Precentage:"$status.EncryptionPercentage  }
+            4 { Write-Host "EncryptionPaused"; Write-Host "Precentage:"$status.EncryptionPercentage  }
+            5 { Write-Host "DecryptionPaused"; Write-Host "Precentage:"$status.EncryptionPercentage  }
+        }
+    }
+        
+    if ($volume.GetProtectionStatus().ProtectionStatus -eq 0) 
+    {
         if ($VerbosePreference -eq "Continue") 
         {
-            $status=$volume.GetConversionStatus()
-            switch ($status.ConversionStatus) 
-            {
-                0 { Write-Host "FullyDecrypted" }
-                1 { Write-Host "FullyEncrypted" }
-                2 { Write-Host "EncryptionInProgress"; Write-Host "Precentage:"$status.EncryptionPercentage }
-                3 { Write-Host "DecryptionInProgress"; Write-Host "Precentage:"$status.EncryptionPercentage  }
-                4 { Write-Host "EncryptionPaused"; Write-Host "Precentage:"$status.EncryptionPercentage  }
-                5 { Write-Host "DecryptionPaused"; Write-Host "Precentage:"$status.EncryptionPercentage  }
-            }
+            Write-Host "ProtectionOff"
+            return
         }
-        
-        if ($volume.GetProtectionStatus().ProtectionStatus -eq 0) 
+        return $false
+    }
+    else 
+    {
+        if ($VerbosePreference -eq "Continue") 
         {
-            if ($VerbosePreference -eq "Continue") 
-            {
-                Write-Host "ProtectionOff"
-                return
-            }
-            return $false
+            Write-Host "ProtectionOn"
+            return
         }
-        else 
-        {
-            if ($VerbosePreference -eq "Continue") 
-            {
-                Write-Host "ProtectionOn"
-                return
-            }
-            return $true
-        }
+        return $true
     }
 }
 
@@ -653,95 +632,87 @@ function Invoke-BitLockerWithTpmAndNumricalKeyProtectors
     Param
     (
         # ComputerName, Type string, System to invoke BitLocker against.
-        [Parameter(Mandatory=$false,
-                   Position=0)]
-        [string]
+        [Parameter(Position=0,
+                   ValueFromPipeline=$true)]
+        [string[]]
         $ComputerName=$env:COMPUTERNAME,
 
         # DriveLetter, Type string, Drive letter to invoke BitLocker against.  if NullOrEmpty the SystemDrive will be used.
-        [Parameter(Mandatory=$false,
-                   Position=1)]
+        [Parameter(Position=1)]
         [ValidatePattern('[a-zA-Z]:')]
         [string]$DriveLetter,
 
         # ADKeyBackup, Type switch, Backups recovery information to the AD DS Object.
-        [Parameter(Mandatory=$false,
-                   position=2)]
+        [Parameter(position=2)]
         [switch]
         $ADKeyBackup=$false
     )
 
-    Begin
+    if (-not(Get-TpmStatus -ComputerName $ComputerName)) 
     {
-        if (-not(Get-TpmStatus -ComputerName $ComputerName)) 
+        throw (Get-TpmStatus -ComputerName $ComputerName -Verbose)
+    }
+
+    $tpm=Get-WmiObject -Class Win32_Tpm -Namespace "root\CIMV2\Security\MicrosoftTpm" -ComputerName $ComputerName -ErrorAction Stop
+    if (-not($tpm.IsOwned_InitialValue)) 
+    {
+        $charArray="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray()
+        $random=""
+        for ($x=0; $x -lt 15; $x++) 
         {
-            throw (Get-TpmStatus -ComputerName $ComputerName -Verbose)
+            $random+=$charArray | Get-Random
+        }
+        $tpm.TakeOwnership($tpm.ConvertToOwnerAuth($random).OwnerAuth) | Out-Null
+    }
+
+    if (-not($DriveLetter)) 
+    {
+        try 
+        {
+            $drive=Get-WmiObject Win32_OperatingSystem -Namespace "root\CIMV2" -ComputerName $ComputerName -Property SystemDrive -ErrorAction Stop
+            $volume=Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$($drive.SystemDrive)'" -ComputerName $ComputerName -ErrorAction Stop
+        }
+        catch 
+        {
+            throw "Unable to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the Win32_OperatingSystem and Win32_EncryptableVolume Namespaces."
         }
     }
-    Process
+    else 
     {
-        $tpm=Get-WmiObject -Class Win32_Tpm -Namespace "root\CIMV2\Security\MicrosoftTpm" -ComputerName $ComputerName -ErrorAction Stop
-        if (-not($tpm.IsOwned_InitialValue)) 
+        $volume=Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
+        if ($volume -eq $null) 
         {
-            $charArray="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray()
-            $random=""
-            for ($x=0; $x -lt 15; $x++) 
-            {
-                $random+=$charArray | Get-Random
-            }
-            $tpm.TakeOwnership($tpm.ConvertToOwnerAuth($random).OwnerAuth) | Out-Null
+            throw "Unable to enumarate the Win32_EncryptableVolume Namespace for $DriveLetter.  Please make sure the drive letter is correct and that the volume is accessable."
         }
+    }
 
-        if (-not($DriveLetter)) 
+    if (-not($volume.GetKeyProtectors(3).VolumeKeyProtectorID)) 
+    {
+        $volume.ProtectKeyWithNumericalPassword() | Out-Null
+        if ($ADKeyBackup) 
         {
             try 
             {
-                $drive=Get-WmiObject Win32_OperatingSystem -Namespace "root\CIMV2" -ComputerName $ComputerName -Property SystemDrive -ErrorAction Stop
-                $volume=Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$($drive.SystemDrive)'" -ComputerName $ComputerName -ErrorAction Stop
+                $volume.BackupRecoveryInformationToActiveDirectory($volume.GetKeyProtectors(3).VolumeKeyProtectorID) | Out-Null
             }
             catch 
             {
-                throw "Unable to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the Win32_OperatingSystem and Win32_EncryptableVolume Namespaces."
+                throw "There was an error backing up the information to AD DS, ensure the proper infrastructure settings are inplace to use this option."
             }
-        }
-        else 
-        {
-            $volume=Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
-            if ($volume -eq $null) 
-            {
-                throw "Unable to enumarate the Win32_EncryptableVolume Namespace for $DriveLetter.  Please make sure the drive letter is correct and that the volume is accessable."
-            }
-        }
-
-        if (-not($volume.GetKeyProtectors(3).VolumeKeyProtectorID)) 
-        {
-            $volume.ProtectKeyWithNumericalPassword() | Out-Null
-            if ($ADKeyBackup) 
-            {
-                try 
-                {
-                    $volume.BackupRecoveryInformationToActiveDirectory($volume.GetKeyProtectors(3).VolumeKeyProtectorID) | Out-Null
-                }
-                catch 
-                {
-                    throw "There was an error backing up the information to AD DS, ensure the proper infrastructure settings are inplace to use this option."
-                }
-            }
-        }
-        if (-not($volume.GetKeyProtectors(1).VolumeKeyProtectorID))
-        {
-            $volume.ProtectKeyWithTPM() | Out-Null
-        }
-
-        switch ($volume.GetConversionStatus().ConversionStatus) 
-        {
-            0 { $volume.Encrypt() | Out-Null }
-            1 { if ($volume.ProtectionStatus -eq 0) { $volume.EnableKeyProtectors() | Out-Null } }
-            4 { $volume.Encrypt() | Out-Null }
         }
     }
-    End
+
+    if (-not($volume.GetKeyProtectors(1).VolumeKeyProtectorID))
     {
-        Get-BitLockerStatus -ComputerName $ComputerName -DriveLetter $volume.DriveLetter -Verbose
+        $volume.ProtectKeyWithTPM() | Out-Null
     }
+
+    switch ($volume.GetConversionStatus().ConversionStatus) 
+    {
+        0 { $volume.Encrypt() | Out-Null }
+        1 { if ($volume.ProtectionStatus -eq 0) { $volume.EnableKeyProtectors() | Out-Null } }
+        4 { $volume.Encrypt() | Out-Null }
+    }
+
+    Get-BitLockerStatus -ComputerName $ComputerName -DriveLetter $volume.DriveLetter -Verbose
 }

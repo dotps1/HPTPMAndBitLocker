@@ -412,7 +412,7 @@ function Invoke-HpTpm
         # ComputerName, Type string, The HP Computer to enable and configure TPM.
         [Parameter(Position=0,
                    ValueFromPipeline=$true)]
-        [string]
+        [string[]]
         $ComputerName=$env:ComputerName,
 
         # Password, Type string, The current Setup Password of the system Bios.
@@ -434,7 +434,7 @@ function Invoke-HpTpm
         $RestartDelay
     )
 
-    if (-not(Get-HPSetupPasswordIsSet))
+    if (-not(Get-HPSetupPasswordIsSet -ComputerName $ComputerName))
     {
         throw "The Bios Setup Password must be set before this cmdlet can be used."
     }

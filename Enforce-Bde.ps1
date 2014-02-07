@@ -1,5 +1,9 @@
-﻿##Enforce-Bde.ps1
-Import-Module .\HpTpmAndBitLocker.psm1
+﻿<#
+    Enforce-Bde.ps1
+    Use this script in conjunction with the the HpTpmAndBitLocker Module to enforce BitLocker Drive Encryption with SCCM
+    If the TPM needs to be enabled, it will return a 3010, which can be identifed for a reboot, else return a 0.
+#>
+Import-Module .\Modules\HpTpmAndBitLocker.psm1
 #Current Setup password, if there is not a current password, one will randomly be generated, and removed after configuration completes.
 $password=""
 
@@ -9,19 +13,17 @@ if (-not(Get-TpmStatus))
 	{
 		$password=powershell ". .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"
 		$randomPasswordUsed=$true
-		Set-HpSetupPassword -NewSetupPassword $password
+		Set-HpSetupPassword -NewPassword $password
 	}
 
-	Invoke-HpTpm -SetupPassword $password
+	Invoke-HpTpm -Password $password
 
 	if ($randomPasswordUsed)
 	{
-		Set-HpSetupPassword -NewSetupPassword " " -CurrentSetupPassword $password
+		Set-HpSetupPassword -NewPassword " " -CurrentPassword $password
 	}
 		
-	Restart-Computer -Force
+	exit 3010
 }
-elseif (-not(Get-BitLockerStatus))
-{
-	Invoke-BitLockerWithTpmAndNumricalKeyProtectors -ADKeyBackup
-}
+
+exit 0

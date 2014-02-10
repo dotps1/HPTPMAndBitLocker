@@ -7,7 +7,7 @@ Import-Module .\Modules\HpTpmAndBitLocker.psm1
 #Current Setup password, if there is not a current password, one will randomly be generated, and removed after configuration completes.
 $password=""
 
-if (-not(Get-TpmStatus))
+if (-not(Get-TpmStatus -ComputerName).Enabled -eq "Yes" -or (-not(Get-TpmStatus -ComputerName).Activated -eq "Yes"))
 {
 	if(-not(Get-HpSetupPasswordIsSet))
 	{

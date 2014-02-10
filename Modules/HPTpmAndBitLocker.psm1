@@ -333,7 +333,7 @@ function Set-HpSetupPassword
 function Get-TpmStatus 
 {
     [CmdletBinding()]
-    [OutputType([bool])]
+    [OutputType([PSobject])]
     Param 
     (
         # ComputerName, Type string, System to evaluate TPM against.
@@ -359,33 +359,27 @@ function Get-TpmStatus
 
     if (-not($tpm.IsEnabled_InitialValue)) 
     {
-        if ($VerbosePreference -eq "Continue") 
-        {
-            Write-Host "TPM is not Enabled."
-            return
-        }
-
-        return $false
+        $enabled="No"
     }
-    elseif (-not($tpm.IsActivated_InitialValue)) 
+    else
     {
-        if ($VerbosePreference -eq "Continue") 
-        {
-            Write-Host "TPM is Enabled, but not Activated."
-            return
-        }
-        return $false
+        $enabled="Yes"
+    }
+    
+    if (-not($tpm.IsActivated_InitialValue))
+    {
+        $activated="No"
     }
     else 
     {
-        if ($VerbosePreference -eq "Continue") 
-        {
-            Write-Host "TPM is both Enabled and Activated."
-            return
-        }
-
-        return $true
+        $activated="Yes"
     }
+
+    $tpmStatus=[PSCustomObject] @{
+                                      'Enabled'  =$enabled
+                                      'Activated'=$activated
+                                 }
+    return $tpmStatus
 }
 
 <#
@@ -510,7 +504,7 @@ function Invoke-HpTpm
 }
 
 <#
-.Synopsis
+.SYNOPSIS
     Gets the current status of BitLocker.
 .DESCRIPTION
     Tests the current status of BitLocker Drive Encryption on an Encryptable Volume.  Only returns true if the volume is fully encrypted and the protection status is on.
@@ -529,7 +523,7 @@ function Invoke-HpTpm
 function Get-BitLockerStatus 
 {    
     [CmdletBinding()]
-    [OutputType([bool])]
+    [OutputType([PSObject])]
     Param
     (
         # ComputerName, Type string, System to evaluate BitLocker against.
@@ -572,42 +566,38 @@ function Get-BitLockerStatus
         }
     }
 
-    if ($VerbosePreference -eq "Continue") 
+    $status=$volume.GetConversionStatus()
+    switch ($status.ConversionStatus) 
     {
-        $status=$volume.GetConversionStatus()
-        switch ($status.ConversionStatus) 
-        {
-            0 { Write-Host "FullyDecrypted" }
-            1 { Write-Host "FullyEncrypted" }
-            2 { Write-Host "EncryptionInProgress"; Write-Host "Precentage:"$status.EncryptionPercentage }
-            3 { Write-Host "DecryptionInProgress"; Write-Host "Precentage:"$status.EncryptionPercentage  }
-            4 { Write-Host "EncryptionPaused"; Write-Host "Precentage:"$status.EncryptionPercentage  }
-            5 { Write-Host "DecryptionPaused"; Write-Host "Precentage:"$status.EncryptionPercentage  }
-        }
+        0 { $state="FullyDecrypted" }
+        1 { $state="FullyEncrypted" }
+        2 { $state="EncryptionInProgress" }
+        3 { $state="DecryptionInProgress" }
+        4 { $state="EncryptionPaused" }
+        5 { $state="DecryptionPaused" }
     }
-        
+
+    $percentage=$status.EncryptionPercentage
+
     if ($volume.GetProtectionStatus().ProtectionStatus -eq 0) 
     {
-        if ($VerbosePreference -eq "Continue") 
-        {
-            Write-Host "ProtectionOff"
-            return
-        }
-        return $false
+        $protection="ProtectionOff"
     }
     else 
     {
-        if ($VerbosePreference -eq "Continue") 
-        {
-            Write-Host "ProtectionOn"
-            return
-        }
-        return $true
+        $protection="ProtectonOn"
     }
+
+    $bdeStatus=[PSCustomObject] @{
+                                      'Protection'=$protection
+                                      'State'     =$state
+                                      'Percentage'=$percentage
+                                 }
+    return $bdeStatus
 }
 
 <#
-.Synopsis
+.SYNOPSIS
     Invokes BitLocker on a drive.
 .DESCRIPTION
     Invokes BitLocker Drive Encryption on an Encryptable Volume with a TPM and Numrical Password Key Protectors.
@@ -648,9 +638,9 @@ function Invoke-BitLockerWithTpmAndNumricalKeyProtectors
         $ADKeyBackup=$false
     )
 
-    if (-not(Get-TpmStatus -ComputerName $ComputerName)) 
+    if (-not(Get-TpmStatus -ComputerName $ComputerName).Enabled -eq "Yes" -or (-not(Get-TpmStatus -ComputerName $ComputerName).Activated -eq "Yes"))
     {
-        throw (Get-TpmStatus -ComputerName $ComputerName -Verbose)
+        throw "The Tpm is not properly configured to use as a Key Protector for BitLocker Drive Encryption."
     }
 
     $tpm=Get-WmiObject -Class Win32_Tpm -Namespace "root\CIMV2\Security\MicrosoftTpm" -ComputerName $ComputerName -ErrorAction Stop
@@ -714,5 +704,5 @@ function Invoke-BitLockerWithTpmAndNumricalKeyProtectors
         4 { $volume.Encrypt() | Out-Null }
     }
 
-    Get-BitLockerStatus -ComputerName $ComputerName -DriveLetter $volume.DriveLetter -Verbose
+    Get-BitLockerStatus -ComputerName $ComputerName -DriveLetter $volume.DriveLetter
 }

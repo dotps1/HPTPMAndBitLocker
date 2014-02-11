@@ -1,5 +1,5 @@
 ﻿<#
-.Synopsis
+.SYNOPSIS
     Converts the return values to user friendly text.
 .DESCRIPTION
     Converts the return values from the .SetBIOSSetting() method to user firendly verbose output.
@@ -28,19 +28,19 @@ function Out-HpVerboseReturnValues
 
     switch ($WmiMethodReturnValue)
     {
-        0 { Write-Host "Success" }
-        1 { Write-Host "Not Supported" }
-        2 { Write-Host "Unspecified Error" }
-        3 { Write-Host "Timeout" }
-        4 { Write-Host "Failed" }
-        5 { Write-Host "Invalid Parameter" }
-        6 { Write-Host "Access Denied " }
+        0 { Write-Output "Success" }
+        1 { Write-Output "Not Supported" }
+        2 { Write-Output "Unspecified Error" }
+        3 { Write-Output "Timeout" }
+        4 { Write-Output "Failed" }
+        5 { Write-Output "Invalid Parameter" }
+        6 { Write-Output "Access Denied " }
         defualt { "Return Value Unknown" }
     }
 }
 
 <#
-.Synopsis
+.SYNOPSIS
     Converts string to KBD encoded string.
 .DESCRIPTION
     Converts UTF16 string to Keyboard Scan Hex Value (KBD).  Older HP BIOS's only accept this encoding method for setup passwords, usful for WMI BIOS Administration.
@@ -174,7 +174,7 @@ function Convert-ToKbdString
 }
 
 <#
-.Synopsis
+.SYNOPSIS
     Gets the current state of the setup password.  It is not possiable to return the current setup password value.
 .DESCRIPTION
     This function will determine if the password is set on the system, automation of Bios Settings cannot be used until the password is set.
@@ -200,20 +200,21 @@ function Get-HpSetupPasswordIsSet
 
     if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
     {
-        throw "Unable to connect to $ComputerName.  Please ensure the system is available."
+        throw "Failed to connect to $ComputerName.  Please ensure the system is available."
     }
 
     try
     {
         $manufacturer=Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop
-        if (-not($manufacturer.Manufacturer -eq "Hewlett-Packard" -or $manufacturer.Manufacturer -eq "HP"))
-        {
-            throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used on Hewlett-Packard systems."
-        }
     }
     catch
     {
-        throw "Unable to connect to the Win32_ComputerSystem WMI Namespace, verify the system is avaialbe and you have the permissions to access the namespace."
+        throw "Failed to connect to the Win32_ComputerSystem WMI Namespace, verify the system is avaialbe and you have the permissions to access the namespace."
+    }
+
+    if (-not($manufacturer.Manufacturer -eq "Hewlett-Packard" -or $manufacturer.Manufacturer -eq "HP"))
+    {
+        throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used on Hewlett-Packard systems."
     }
 
     $hpBios=Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
@@ -229,7 +230,7 @@ function Get-HpSetupPasswordIsSet
 }
 
 <#
-.Synopsis
+.SYNOPSIS
     Sets the Setup Password on an HP Bios.
 .DESCRIPTION
     This function can be used to set a password on the Bios, it can also be used to clear the password, the current password is needed to change the value.
@@ -269,7 +270,7 @@ function Set-HpSetupPassword
 
     if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
     {
-        throw "Unable to connect to $ComputerName.  Please ensure the system is available."
+        throw "Failed to connect to $ComputerName.  Please ensure the system is available."
     }
 
     try
@@ -282,7 +283,7 @@ function Set-HpSetupPassword
     }
     catch
     {
-        throw "Unable to connect to the Win32_ComputerSystem WMI Namespace, verify the system is avaialbe and you have the permissions to access the namespace."
+        throw "Failed to connect to the Win32_ComputerSystem WMI Namespace, verify the system is avaialbe and you have the permissions to access the namespace."
     }
 
     if (-not([String]::IsNullOrWhiteSpace($NewPassword)))
@@ -311,12 +312,12 @@ function Set-HpSetupPassword
         defualt  { throw "Current setup password encoding unknown, exiting." }
     }
 
-    Write-Host "Setting Password..."
+    Write-Output "Setting Password..."
     Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Setup Password",$NewSetupPassword,$CurrentSetupPassword)).Return
 }
 
 <#
-.Synopsis
+.SYNOPSIS
    Get the current status of the TPM.
 .DESCRIPTION
    Tests the status of the Trusted Platform Module, only returns true if both enabled and activated.
@@ -345,7 +346,7 @@ function Get-TpmStatus
 
     if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
     {
-        throw "Unable to connect to $ComputerName.  Please ensure the system is available."
+        throw "Failed to connect to $ComputerName.  Please ensure the system is available."
     }
 
     try 
@@ -354,7 +355,7 @@ function Get-TpmStatus
     }
     catch 
     {
-        throw "Unable to connect to the Win32_Tpm Namespace, You may not have sufficent rights."
+        throw "Failed to connect to the Win32_Tpm Namespace, You may not have sufficent rights."
     }
 
     if (-not($tpm.IsEnabled_InitialValue)) 
@@ -383,7 +384,7 @@ function Get-TpmStatus
 }
 
 <#
-.Synopsis
+.SYNOPSIS
     Enables the Trusted Platform Module.
 .DESCRIPTION
     Enables and configures the required settings of the TPM in order to use the TPM Protector Type for BitLocker drive encryption.
@@ -443,7 +444,7 @@ function Invoke-HpTpm
         defualt  { throw "Setup password encoding unknown, exiting." }
     }
 
-    Write-Host "Enabling the Trusted Platform Module..."
+    Write-Output "Enabling the Trusted Platform Module..."
     if (($hpBios | ?{ $_.Name -eq "Embedded Security Device" }) -ne $null)
     {
         Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Device","Device available",$SetupPassword)).Return
@@ -457,7 +458,7 @@ function Invoke-HpTpm
         Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("TPM Device","Available",$SetupPassword)).Return
     }
 
-    Write-Host "Activating the Trusted Platform Module..."
+    Write-Output "Activating the Trusted Platform Module..."
     if (($hpBios | ?{ $_.Name -eq "Activate Embedded Security On Next Boot" }) -ne $null)
     {
         Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Activate Embedded Security On Next Boot","Enable",$SetupPassword)).Return
@@ -467,7 +468,7 @@ function Invoke-HpTpm
         Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Activate TPM On Next Boot","Enable",$SetupPassword)).Return
     }
 
-    Write-Host "Setting Trusted Platform Module Activation Policy..."
+    Write-Output "Setting Trusted Platform Module Activation Policy..."
     if (($hpBios | ?{ $_.Name -eq "Embedded Security Activation Policy" }) -ne $null )
     {
         Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Activation Policy","No prompts",$SetupPassword)).Return
@@ -477,7 +478,7 @@ function Invoke-HpTpm
         Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("TPM Activation Policy","No prompts",$SetupPassword)).Return
     }
 
-    Write-Host "Setting Operating System Management of Trusted Platform Module..."
+    Write-Output "Setting Operating System Management of Trusted Platform Module..."
     if (($hpBios | ?{ $_.Name -eq "OS management of Embedded Security Device" }) -ne $null)
     {
         Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("OS management of Embedded Security Device","Enable",$SetupPassword)).Return
@@ -487,7 +488,7 @@ function Invoke-HpTpm
         Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("OS Management of TPM","Enable",$SetupPassword)).Return
     }
 
-    Write-Host "Setting Reset Capabilites of Trusted Platform Module for Operating System..."
+    Write-Output "Setting Reset Capabilites of Trusted Platform Module for Operating System..."
     if (($hpBios | ?{ $_.Name -eq "Reset of Embedded Security Device through OS" }) -ne $null)
     {
         Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Reset of Embedded Security Device through OS","Enable",$SetupPassword)).Return
@@ -542,7 +543,7 @@ function Get-BitLockerStatus
 
     if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
     {
-        throw "Unable to connect to $ComputerName.  Please ensure the system is available."
+        throw "Failed to connect to $ComputerName.  Please ensure the system is available."
     }
 
     if (-not($DriveLetter)) 
@@ -554,7 +555,7 @@ function Get-BitLockerStatus
         }
         catch 
         {
-            throw "Unable to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the Win32_OperatingSystem and Win32_EncryptableVolume Namespaces."
+            throw "Failed to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the Win32_OperatingSystem and Win32_EncryptableVolume Namespaces."
         }
     }
     else 
@@ -562,7 +563,7 @@ function Get-BitLockerStatus
         $volume=Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
         if ($volume -eq $null) 
         {
-            throw "Unable to enumarate the Win32_EncryptableVolume Namespace for $DriveLetter.  Please make sure the drive letter is correct and that the volume is accessable."
+            throw "Failed to enumarate the Win32_EncryptableVolume Namespace for $DriveLetter.  Please make sure the drive letter is correct and that the volume is accessable."
         }
     }
 
@@ -664,7 +665,7 @@ function Invoke-BitLockerWithTpmAndNumricalKeyProtectors
         }
         catch 
         {
-            throw "Unable to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the Win32_OperatingSystem and Win32_EncryptableVolume Namespaces."
+            throw "Failed to connect to the necassary WMI Namespaces, to get the system drive.  Verfy that you have sufficent rights to connect to the Win32_OperatingSystem and Win32_EncryptableVolume Namespaces."
         }
     }
     else 
@@ -672,7 +673,7 @@ function Invoke-BitLockerWithTpmAndNumricalKeyProtectors
         $volume=Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
         if ($volume -eq $null) 
         {
-            throw "Unable to enumarate the Win32_EncryptableVolume Namespace for $DriveLetter.  Please make sure the drive letter is correct and that the volume is accessable."
+            throw "Failed to enumarate the Win32_EncryptableVolume Namespace for $DriveLetter.  Please make sure the drive letter is correct and that the volume is accessable."
         }
     }
 

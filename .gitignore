@@ -1,4 +1,4 @@
-Publish-ToSccmSourcesDirectory.ps1
+.\Scripts\Publish-ToSccmSourcesDirectory.ps1
 
 #################
 ## Eclipse

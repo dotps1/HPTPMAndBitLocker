@@ -586,7 +586,7 @@ function Get-BitLockerStatus
     }
     else 
     {
-        $protection="ProtectonOn"
+        $protection="ProtectionOn"
     }
 
     $bdeStatus=[PSCustomObject] @{

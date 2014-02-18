@@ -14,11 +14,5 @@ Copy-Item $sourceDir"\Modules\HpTpmAndBitLocker.psm1" -Destination $destinationD
 Copy-Item $sourceDir"\Scripts\New-RandomPassword.ps1" -Destination $destinationDir2"\Scripts"
 
 #Sign all items
-Set-AuthenticodeSignature $destinationDir1"\Enforce-Bde.ps1" -Certificate (dir Cert:\CurrentUser\my\0FF4E6B85B633F2F0030290DB8AF29D978464B24) -TimestampServer http://timestamp.verisign.com/scripts/timstamp.dll
-Set-AuthenticodeSignature $destinationDir1"\Modules\HpTpmAndBitLocker.psd1" -Certificate (dir Cert:\CurrentUser\my\0FF4E6B85B633F2F0030290DB8AF29D978464B24) -TimestampServer http://timestamp.verisign.com/scripts/timstamp.dll
-Set-AuthenticodeSignature $destinationDir1"\Modules\HpTpmAndBitLocker.psm1" -Certificate (dir Cert:\CurrentUser\my\0FF4E6B85B633F2F0030290DB8AF29D978464B24) -TimestampServer http://timestamp.verisign.com/scripts/timstamp.dll
-Set-AuthenticodeSignature $destinationDir1"\Scripts\New-RandomPassword.ps1" -Certificate (dir Cert:\CurrentUser\my\0FF4E6B85B633F2F0030290DB8AF29D978464B24) -TimestampServer http://timestamp.verisign.com/scripts/timstamp.dll
-
-Set-AuthenticodeSignature $destinationDir2"\Modules\HpTpmAndBitLocker.psd1" -Certificate (dir Cert:\CurrentUser\my\0FF4E6B85B633F2F0030290DB8AF29D978464B24) -TimestampServer http://timestamp.verisign.com/scripts/timstamp.dll
-Set-AuthenticodeSignature $destinationDir2"\Modules\HpTpmAndBitLocker.psm1" -Certificate (dir Cert:\CurrentUser\my\0FF4E6B85B633F2F0030290DB8AF29D978464B24) -TimestampServer http://timestamp.verisign.com/scripts/timstamp.dll
-Set-AuthenticodeSignature $destinationDir2"\Scripts\New-RandomPassword.ps1" -Certificate (dir Cert:\CurrentUser\my\0FF4E6B85B633F2F0030290DB8AF29D978464B24) -TimestampServer http://timestamp.verisign.com/scripts/timstamp.dll
+Get-ChildItem $destinationDir1 -Recurse -Include *.ps1,*.psd1,*.psm1 | %{ Set-AuthenticodeSignature $_.FullName -Certificate (dir Cert:\CurrentUser\my\0FF4E6B85B633F2F0030290DB8AF29D978464B24) -TimestampServer http://timestamp.verisign.com/scripts/timstamp.dll }
+Get-ChildItem $destinationDir2 -Recurse -Include *.ps1,*.psd1,*.psm1 | %{ Set-AuthenticodeSignature $_.FullName -Certificate (dir Cert:\CurrentUser\my\0FF4E6B85B633F2F0030290DB8AF29D978464B24) -TimestampServer http://timestamp.verisign.com/scripts/timstamp.dll }

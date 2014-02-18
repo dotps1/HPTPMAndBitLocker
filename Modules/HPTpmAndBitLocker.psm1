@@ -181,7 +181,7 @@ function Convert-ToKbdString
 .EXAMPLE
     Get-HpSetupPasswordIsSet
 .EXAMPLE
-    Get-HpSetupPasswordIsSet -ComputerName "mycomputer.mydomain.org
+    Get-HpSetupPasswordIsSet -ComputerName "mycomputer.mydomain.org"
 .LINKS
     https://github.com/necromorph1024/HPTpmAndBitLocker
 #>
@@ -324,9 +324,7 @@ function Set-HpSetupPassword
 .EXAMPLE
    Get-TpmStatus
 .EXAMPLE
-   Get-TpmStatus -ComputerName "mycomputer.mydomain.org" -Verbose
-.NOTES
-    Use the -Verbose switch for user friendly STDOUT.
+   Get-TpmStatus -ComputerName "mycomputer.mydomain.org"
 .LINKS
     https://github.com/necromorph1024/HPTpmAndBitLocker
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376484%28v=vs.85%29.aspx
@@ -512,11 +510,10 @@ function Invoke-HpTpm
 .EXAMPLE
     Get-BitLockerStatus
 .EXAMPLE
-    Get-BitLockerStatus -ComputerName "mycomputer.mydomain.com" -DriveLetter C: -Verbose
+    Get-BitLockerStatus -ComputerName "mycomputer.mydomain.com" -DriveLetter C:
 .NOTES
     If no drive letter is specified, the default system drive will be used.
     The drive letter must be followed with a double colon.  IE: "C:".
-    Use the -Verbose switch for user friendly STDOUT.
 .LINKS
     https://github.com/necromorph1024/HPTpmAndBitLocker
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376483%28v=vs.85%29.aspx

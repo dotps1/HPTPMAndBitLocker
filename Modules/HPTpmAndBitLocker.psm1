@@ -2,12 +2,12 @@
 .SYNOPSIS
     Converts the return values to user friendly text.
 .DESCRIPTION
-    Converts the return values from the .SetBIOSSetting() method to user firendly verbose output.
+    Converts the return values from the .SetBIOSSetting() WMI Method to user firendly verbose output.
 .EXAMPLE
     Out-HpVerboseReturnValues -WmiMethodReturnValue 0
 .EXAMPLE
     Out-HpVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Setup Password"," ",$SetupPassword))
-.LINKS
+.LINK
     https://github.com/necromorph1024/HPTpmAndBitLocker
     http://h20331.www2.hp.com/Hpsub/downloads/cmi_whitepaper.pdf  Page: 14
 #>
@@ -46,7 +46,7 @@ function Out-HpVerboseReturnValues
     Converts UTF16 string to Keyboard Scan Hex Value (KBD).  Older HP BIOS's only accept this encoding method for setup passwords, usful for WMI BIOS Administration.
 .EXAMPLE
     Convert-ToKbdString -UnicodeString "MyStringToConvert"
-.LINKS
+.LINK
     https://github.com/necromorph1024/HPTpmAndBitLocker
     http://www.codeproject.com/Articles/7305/Keyboard-Events-Simulation-using-keybd_event-funct
     http://msdn.microsoft.com/en-us/library/aa299374%28v=vs.60%29.aspx
@@ -182,7 +182,7 @@ function Convert-ToKbdString
     Get-HpSetupPasswordIsSet
 .EXAMPLE
     Get-HpSetupPasswordIsSet -ComputerName "mycomputer.mydomain.org"
-.LINKS
+.LINK
     https://github.com/necromorph1024/HPTpmAndBitLocker
 #>
 function Get-HpSetupPasswordIsSet
@@ -241,7 +241,7 @@ function Get-HpSetupPasswordIsSet
     Set-HpSetupPassword -ComputerName "mycomputer.mydomain.org" -NewSetupPassword " " -CurrentSetupPassword "MyCurrentPassword"
 .EXAMPLE
     Set-HpSetupPassword -NewSetupPassword "MyNewSetupPassword" -CurrentSetupPassword "MyCurrentPassword"
-.LINKS
+.LINK
     https://github.com/necromorph1024/HPTpmAndBitLocker
 #>
 function Set-HpSetupPassword
@@ -325,7 +325,7 @@ function Set-HpSetupPassword
    Get-TpmStatus
 .EXAMPLE
    Get-TpmStatus -ComputerName "mycomputer.mydomain.org"
-.LINKS
+.LINK
     https://github.com/necromorph1024/HPTpmAndBitLocker
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376484%28v=vs.85%29.aspx
 #>
@@ -393,7 +393,7 @@ function Get-TpmStatus
     Invoke-HpTpm -ComputerName "mycomputer.mydomain.org" -SetupPassword "MyPassword"
 .EXAMPLE
     Invoke-HpTpm -SetupPassword "ABCD1234" -RestartComputer -RestartDelay 30
-.LINKS
+.LINK
     https://github.com/necromorph1024/HPTpmAndBitLocker
 #>
 function Invoke-HpTpm
@@ -514,7 +514,7 @@ function Invoke-HpTpm
 .NOTES
     If no drive letter is specified, the default system drive will be used.
     The drive letter must be followed with a double colon.  IE: "C:".
-.LINKS
+.LINK
     https://github.com/necromorph1024/HPTpmAndBitLocker
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376483%28v=vs.85%29.aspx
 #>
@@ -608,7 +608,7 @@ function Get-BitLockerStatus
     ADKeyBackup switch requires proper TPM ACL Delegation in Active Directory to be used.
     This function will resume encryption if currently paused, or suspended.
     If used outside of the scope of this module, the Get-TpmStatus and Get-BitLockerStatus cmdlets are required.
-.LINKS
+.LINK
     https://github.com/necromorph1024/HPTpmAndBitLocker
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376483%28v=vs.85%29.aspx
     http://technet.microsoft.com/en-us/library/dd875529%28v=ws.10%29.aspx

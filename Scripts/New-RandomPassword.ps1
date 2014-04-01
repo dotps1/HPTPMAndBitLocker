@@ -1,14 +1,17 @@
 ﻿<#
-.Synopsis
+.SYNOPSIS
     Creates random password string of length 1 to 100.
 .DESCRIPTION
     Creates random password with ability to choose what characters are in the string and the length, the symbols can be specificlly defined.
 .EXAMPLE
     New-RandomPassword -Length 8 -Lowercase
+    In this example, a random string that consists of 8 lowercase charcters will be returned.
 .EXAMPLE
     New-RandomPassword -Length 15 -Lowercase -Uppercase -Numbers -Symbols
-.LINKS
+    In this example, a random string that consists of 15 lowercase, uppercase, alpha-numeric and symbols will be returned.
+.LINK
     http://www.asciitable.com/
+    https://gist.github.com/necromorph1024/9119817
 #>
 function New-RandomPassword 
 {
@@ -57,10 +60,10 @@ function New-RandomPassword
         $CHARSET_SYMBOL=8
 
         # Creates character arrays for the different character classes, based on ASCII character values.
-        $charsLower=97..122 | % { [Char] $_ }
-        $charsUpper=65..90 | % { [Char] $_ }
-        $charsNumber=48..57 | % { [Char] $_ }
-        $charsSymbol=35,36,40,41,42,44,45,46,47,58,59,63,64,92,95 | % { [Char] $_ }
+        $charsLower=97..122 | %{ [Char] $_ }
+        $charsUpper=65..90 | %{ [Char] $_ }
+        $charsNumber=48..57 | %{ [Char] $_ }
+        $charsSymbol=35,36,40,41,42,44,45,46,47,58,59,63,64,92,95 | %{ [Char] $_ }
     }
     Process
     {
@@ -90,7 +93,7 @@ function New-RandomPassword
         }
 
         <#
-        .Synopsis
+        .SYNOPSIS
             Test string for existnce specified character.
         .DESCRIPTION
             examins each character of a string to determine if it contains a specificed characters
@@ -122,28 +125,28 @@ function New-RandomPassword
             {
                 if (Test-StringContents $output $charsLower) 
                 {
-                    $flags = $flags -bor $CHARSET_LOWER
+                    $flags=$flags -bor $CHARSET_LOWER
                 }
             }
             if ($Uppercase) 
             {
                 if (Test-StringContents $output $charsUpper) 
                 {
-                    $flags = $flags -bor $CHARSET_UPPER
+                    $flags=$flags -bor $CHARSET_UPPER
                 }
             }
             if ($Numbers) 
             {
                 if (Test-StringContents $output $charsNumber) 
                 {
-                    $flags = $flags -bor $CHARSET_NUMBER
+                    $flags=$flags -bor $CHARSET_NUMBER
                 }
             }
             if ($Symbols) 
             {
                 if (Test-StringContents $output $charsSymbol) 
                 {
-                    $flags = $flags -bor $CHARSET_SYMBOL
+                    $flags=$flags -bor $CHARSET_SYMBOL
                 }
             }
         }

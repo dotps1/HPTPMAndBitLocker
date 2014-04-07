@@ -18,7 +18,7 @@
 function Get-UnEncryptedWorkstations
 {
     [CmdletBinding()]
-    [OutputType([string[]])]
+    [OutputType([array])]
     Param
     (
         # SqlServer, Type string, The SQL Server containing the ConfigMgr database.
@@ -27,14 +27,14 @@ function Get-UnEncryptedWorkstations
         [string]
         $SqlServer=$env:COMPUTERNAME,
 
-        # ConnectionPort, Type int, Port to connect to SQL server with, defualt value is 1433
+        # ConnectionPort, Type int, Port to connect to SQL server with, defualt value is 1433.
         [parameter(Position=1)]
         [ValidateRange(1,50009)]
         [Alias("Port")]
         [int]
         $ConnectionPort=1433,
 
-        # Database, Type string, The name of the ConfigMgr database
+        # Database, Type string, The name of the ConfigMgr database.
         [Parameter(Mandatory=$true,
                    Position=2)]
         [string]
@@ -101,8 +101,9 @@ function Get-UnEncryptedWorkstations
     {
         While ($results.Read())
         {
-            $results["ComputerName"]
+            $workstations+=@($results["ComputerName"])
         }
+        return $workstations
     }
 
     $results.Close()

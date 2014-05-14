@@ -15,7 +15,7 @@
 .LINK
     https://gist.github.com/necromorph1024/9215724
 #>
-function Get-UnEncryptedWorkstations
+function Get-UnEncryptedWorkstationsFromCCMDB
 {
     [CmdletBinding()]
     [OutputType([array])]

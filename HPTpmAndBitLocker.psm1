@@ -8,8 +8,9 @@
 .EXAMPLE
     Out-HpVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Setup Password"," ",$SetupPassword))
 .LINK
-    https://github.com/necromorph1024/HPTpmAndBitLocker
     http://h20331.www2.hp.com/Hpsub/downloads/cmi_whitepaper.pdf  Page: 14
+    https://github.com/PowerShellSith
+    Twitter: @PowerShellSith
 #>
 function Out-HpVerboseReturnValues
 {
@@ -18,9 +19,9 @@ function Out-HpVerboseReturnValues
     Param
     (
         # WmiMethodReturnValue, Type int, The Return Property Value to be converted to verbose output.
-        [Parameter(Mandatory=$true,
-                   Position=0,
-                   ValueFromPipeline=$true)]
+        [Parameter(Mandatory = $true,
+                   Position = 0,
+                   ValueFromPipeline  =  $true)]
         [Alias("RetVal")]
         [int]
         $WmiMethodReturnValue
@@ -47,10 +48,11 @@ function Out-HpVerboseReturnValues
 .EXAMPLE
     Convert-ToKbdString -UnicodeString "MyStringToConvert"
 .LINK
-    https://github.com/necromorph1024/HPTpmAndBitLocker
     http://www.codeproject.com/Articles/7305/Keyboard-Events-Simulation-using-keybd_event-funct
-    http://msdn.microsoft.com/en-us/library/aa299374%28v=vs.60%29.aspx
+    http://msdn.microsoft.com/en-us/library/aa299374%28v = vs.60%29.aspx
     http://h20331.www2.hp.com/Hpsub/downloads/cmi_whitepaper.pdf  Page: 14
+    https://github.com/PowerShellSith
+    Twitter: @PowerShellSith
 #>
 function Convert-ToKbdString 
 {
@@ -59,116 +61,116 @@ function Convert-ToKbdString
     Param
     (
         # Input, Type string, String to be encoded with EN Keyboard Scan Code Hex Values.
-        [Parameter(Mandatory=$true,
-                   Position=0,
-                   ValueFromPipeline=$true)]
+        [Parameter(Mandatory = $true,
+                   Position = 0,
+                   ValueFromPipeline = $true)]
         [Alias("UniStr")]
         [AllowEmptyString()]
         [string]
         $UnicodeString
     )
 
-    $kbdHexVals=New-Object System.Collections.Hashtable
+    $kbdHexVals = New-Object System.Collections.Hashtable
 
-    $kbdHexVals."a"="1E"
-    $kbdHexVals."b"="30"
-    $kbdHexVals."c"="2E"
-    $kbdHexVals."d"="20"
-    $kbdHexVals."e"="12"
-    $kbdHexVals."f"="21"
-    $kbdHexVals."g"="22"
-    $kbdHexVals."h"="23"
-    $kbdHexVals."i"="17"
-    $kbdHexVals."j"="24"
-    $kbdHexVals."k"="25"
-    $kbdHexVals."l"="26"
-    $kbdHexVals."m"="32"
-    $kbdHexVals."n"="31"
-    $kbdHexVals."o"="18"
-    $kbdHexVals."p"="19"
-    $kbdHexVals."q"="10"
-    $kbdHexVals."r"="13"
-    $kbdHexVals."s"="1F"
-    $kbdHexVals."t"="14"
-    $kbdHexVals."u"="16"
-    $kbdHexVals."v"="2F"
-    $kbdHexVals."w"="11"
-    $kbdHexVals."x"="2D"
-    $kbdHexVals."y"="15"
-    $kbdHexVals."z"="2C"
-    $kbdHexVals."A"="9E"
-    $kbdHexVals."B"="B0"
-    $kbdHexVals."C"="AE"
-    $kbdHexVals."D"="A0"
-    $kbdHexVals."E"="92"
-    $kbdHexVals."F"="A1"
-    $kbdHexVals."G"="A2"
-    $kbdHexVals."H"="A3"
-    $kbdHexVals."I"="97"
-    $kbdHexVals."J"="A4"
-    $kbdHexVals."K"="A5"
-    $kbdHexVals."L"="A6"
-    $kbdHexVals."M"="B2"
-    $kbdHexVals."N"="B1"
-    $kbdHexVals."O"="98"
-    $kbdHexVals."P"="99"
-    $kbdHexVals."Q"="90"
-    $kbdHexVals."R"="93"
-    $kbdHexVals."S"="9F"
-    $kbdHexVals."T"="94"
-    $kbdHexVals."U"="96"
-    $kbdHexVals."V"="AF"
-    $kbdHexVals."W"="91"
-    $kbdHexVals."X"="AD"
-    $kbdHexVals."Y"="95"
-    $kbdHexVals."Z"="AC"
-    $kbdHexVals."1"="02"
-    $kbdHexVals."2"="03"
-    $kbdHexVals."3"="04"
-    $kbdHexVals."4"="05"
-    $kbdHexVals."5"="06"
-    $kbdHexVals."6"="07"
-    $kbdHexVals."7"="08"
-    $kbdHexVals."8"="09"
-    $kbdHexVals."9"="0A"
-    $kbdHexVals."0"="0B"
-    $kbdHexVals."!"="82"
-    $kbdHexVals."@"="83"
-    $kbdHexVals."#"="84"
-    $kbdHexVals."$"="85"
-    $kbdHexVals."%"="86"
-    $kbdHexVals."^"="87"
-    $kbdHexVals."&"="88"
-    $kbdHexVals."*"="89"
-    $kbdHexVals."("="8A"
-    $kbdHexVals.")"="8B"
-    $kbdHexVals."-"="0C"
-    $kbdHexVals."_"="8C"
-    $kbdHexVals."="="0D"
-    $kbdHexVals."+"="8D"
-    $kbdHexVals."["="1A"
-    $kbdHexVals."{"="9A"
-    $kbdHexVals."]"="1B"
-    $kbdHexVals."}"="9B"
-    $kbdHexVals.";"="27"
-    $kbdHexVals.":"="A7"
-    $kbdHexVals."'"="28"
-    $kbdHexVals."`""="A8"
-    $kbdHexVals."``"="29"
-    $kbdHexVals."~"="A9"
-    $kbdHexVals."\"="2B"
-    $kbdHexVals."|"="AB"
-    $kbdHexVals.","="33"
-    $kbdHexVals."<"="B3"
-    $kbdHexVals."."="34"
-    $kbdHexVals.">"="B4"
-    $kbdHexVals."/"="35"
-    $kbdHexVals."?"="B5"
+    $kbdHexVals."a"  =  "1E"
+    $kbdHexVals."b" = "30"
+    $kbdHexVals."c" = "2E"
+    $kbdHexVals."d" = "20"
+    $kbdHexVals."e" = "12"
+    $kbdHexVals."f" = "21"
+    $kbdHexVals."g" = "22"
+    $kbdHexVals."h" = "23"
+    $kbdHexVals."i" = "17"
+    $kbdHexVals."j" = "24"
+    $kbdHexVals."k" = "25"
+    $kbdHexVals."l" = "26"
+    $kbdHexVals."m" = "32"
+    $kbdHexVals."n" = "31"
+    $kbdHexVals."o" = "18"
+    $kbdHexVals."p" = "19"
+    $kbdHexVals."q" = "10"
+    $kbdHexVals."r" = "13"
+    $kbdHexVals."s" = "1F"
+    $kbdHexVals."t" = "14"
+    $kbdHexVals."u" = "16"
+    $kbdHexVals."v" = "2F"
+    $kbdHexVals."w" = "11"
+    $kbdHexVals."x" = "2D"
+    $kbdHexVals."y" = "15"
+    $kbdHexVals."z" = "2C"
+    $kbdHexVals."A" = "9E"
+    $kbdHexVals."B" = "B0"
+    $kbdHexVals."C" = "AE"
+    $kbdHexVals."D" = "A0"
+    $kbdHexVals."E" = "92"
+    $kbdHexVals."F" = "A1"
+    $kbdHexVals."G" = "A2"
+    $kbdHexVals."H" = "A3"
+    $kbdHexVals."I" = "97"
+    $kbdHexVals."J" = "A4"
+    $kbdHexVals."K" = "A5"
+    $kbdHexVals."L" = "A6"
+    $kbdHexVals."M" = "B2"
+    $kbdHexVals."N" = "B1"
+    $kbdHexVals."O" = "98"
+    $kbdHexVals."P" = "99"
+    $kbdHexVals."Q" = "90"
+    $kbdHexVals."R" = "93"
+    $kbdHexVals."S" = "9F"
+    $kbdHexVals."T" = "94"
+    $kbdHexVals."U" = "96"
+    $kbdHexVals."V" = "AF"
+    $kbdHexVals."W" = "91"
+    $kbdHexVals."X" = "AD"
+    $kbdHexVals."Y" = "95"
+    $kbdHexVals."Z" = "AC"
+    $kbdHexVals."1" = "02"
+    $kbdHexVals."2" = "03"
+    $kbdHexVals."3" = "04"
+    $kbdHexVals."4" = "05"
+    $kbdHexVals."5" = "06"
+    $kbdHexVals."6" = "07"
+    $kbdHexVals."7" = "08"
+    $kbdHexVals."8" = "09"
+    $kbdHexVals."9" = "0A"
+    $kbdHexVals."0" = "0B"
+    $kbdHexVals."!" = "82"
+    $kbdHexVals."@" = "83"
+    $kbdHexVals."#" = "84"
+    $kbdHexVals."$" = "85"
+    $kbdHexVals."%" = "86"
+    $kbdHexVals."^" = "87"
+    $kbdHexVals."&" = "88"
+    $kbdHexVals."*" = "89"
+    $kbdHexVals."(" = "8A"
+    $kbdHexVals.")" = "8B"
+    $kbdHexVals."-" = "0C"
+    $kbdHexVals."_" = "8C"
+    $kbdHexVals." = " = "0D"
+    $kbdHexVals."+" = "8D"
+    $kbdHexVals."[" = "1A"
+    $kbdHexVals."{" = "9A"
+    $kbdHexVals."]" = "1B"
+    $kbdHexVals."}" = "9B"
+    $kbdHexVals.";" = "27"
+    $kbdHexVals.":" = "A7"
+    $kbdHexVals."'" = "28"
+    $kbdHexVals."`"" = "A8"
+    $kbdHexVals."``" = "29"
+    $kbdHexVals."~" = "A9"
+    $kbdHexVals."\" = "2B"
+    $kbdHexVals."|" = "AB"
+    $kbdHexVals."," = "33"
+    $kbdHexVals."<" = "B3"
+    $kbdHexVals."." = "34"
+    $kbdHexVals.">" = "B4"
+    $kbdHexVals."/" = "35"
+    $kbdHexVals."?" = "B5"
 
-    $kbdEncodedString=""
+    $kbdEncodedString = ""
     foreach ($char in $UnicodeString.ToCharArray())
     {
-        $kbdEncodedString+=$kbdHexVals.Get_Item($char.ToString())
+        $kbdEncodedString += $kbdHexVals.Get_Item($char.ToString())
     }
     return $kbdEncodedString
 }
@@ -183,7 +185,8 @@ function Convert-ToKbdString
 .EXAMPLE
     Get-HpSetupPasswordIsSet -ComputerName "mycomputer.mydomain.org"
 .LINK
-    https://github.com/necromorph1024/HPTpmAndBitLocker
+    https://github.com/PowerShellSith
+    Twitter: @PowerShellSith
 #>
 function Get-HpSetupPasswordIsSet
 {
@@ -192,10 +195,10 @@ function Get-HpSetupPasswordIsSet
     Param
     (
         # ComputerName, Type string, System to evaluate Setup Password state against.
-        [Parameter(Position=0,
-                   ValueFromPipeline=$true)]
+        [Parameter(Position = 0,
+                   ValueFromPipeline = $true)]
         [string[]]
-        $ComputerName=$env:COMPUTERNAME
+        $ComputerName = $env:COMPUTERNAME
     )
 
     if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
@@ -205,7 +208,7 @@ function Get-HpSetupPasswordIsSet
 
     try
     {
-        $manufacturer=Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop
+        $manufacturer = Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop
     }
     catch
     {
@@ -217,7 +220,7 @@ function Get-HpSetupPasswordIsSet
         throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used on Hewlett-Packard systems."
     }
 
-    $hpBios=Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
+    $hpBios = Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
 
     if (($hpBios | ?{ $_.Name -eq 'Setup Password' }).IsSet -eq 0)
     {
@@ -242,7 +245,8 @@ function Get-HpSetupPasswordIsSet
 .EXAMPLE
     Set-HpSetupPassword -NewSetupPassword "MyNewSetupPassword" -CurrentSetupPassword "MyCurrentPassword"
 .LINK
-    https://github.com/necromorph1024/HPTpmAndBitLocker
+    https://github.com/PowerShellSith
+    Twitter: @PowerShellSith
 #>
 function Set-HpSetupPassword
 {
@@ -251,19 +255,19 @@ function Set-HpSetupPassword
     Param
     (
         # ComputerName, Type string, System to set Bios Setup Password.
-        [Parameter(Position=0,
-                   ValueFromPipeline=$true)]
+        [Parameter(Position = 0,
+                   ValueFromPipeline = $true)]
         [string[]]
-        $ComputerName=$env:COMPUTERNAME,
+        $ComputerName = $env:COMPUTERNAME,
 
         # NewPassword, Type string, The value of the password to be set.  The password can be cleared by using a space surrounded by double quotes, IE: " ".
-        [Parameter(Mandatory=$true,
-                   Position=1)]
+        [Parameter(Mandatory = $true,
+                   Position = 1)]
         [string]
         $NewPassword,
 
         # CurrentPassword, Type string, The value of the current setup password.
-        [Parameter(Position=2)]
+        [Parameter(Position = 2)]
         [string]
         $CurrentPassword
     )
@@ -275,7 +279,7 @@ function Set-HpSetupPassword
 
     try
     {
-        $manufacturer=Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop
+        $manufacturer = Get-WmiObject -Class Win32_ComputerSystem -Namespace "root\CIMV2" -Property "Manufacturer" -ComputerName $ComputerName -ErrorAction Stop
         if (-not($manufacturer.Manufacturer -eq "Hewlett-Packard" -or $manufacturer.Manufacturer -eq "HP"))
         {
             throw "Computer Manufacturer is not of type Hewlett-Packard.  This cmdlet can only be used on Hewlett-Packard systems."
@@ -294,25 +298,24 @@ function Set-HpSetupPassword
         }
     }
 
-    $hpBios=Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
-    $hpBiosSettings=Get-WmiObject -Class HPBIOS_BIOSSettingInterface -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction stop
+    $hpBios = Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
+    $hpBiosSettings = Get-WmiObject -Class HPBIOS_BIOSSettingInterface -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction stop
 
     switch (($hpBios | ?{ $_.Name -eq "Setup Password" }).SupportedEncoding)
     {
         "kbd"
         { 
-            $NewSetupPassword="<kbd/>"+(Convert-ToKbdString -UnicodeString $NewPassword) 
-            $CurrentSetupPassword="<kbd/>"+(Convert-ToKbdString -UnicodeString $CurrentPassword) 
+            $NewSetupPassword = "<kbd/>"+(Convert-ToKbdString -UnicodeString $NewPassword) 
+            $CurrentSetupPassword = "<kbd/>"+(Convert-ToKbdString -UnicodeString $CurrentPassword) 
         }
         "utf-16"
         { 
-            $NewSetupPassword="<utf-16/>"+$NewPassword 
-            $CurrentSetupPassword="<utf-16/>"+$CurrentPassword 
+            $NewSetupPassword = "<utf-16/>"+$NewPassword 
+            $CurrentSetupPassword = "<utf-16/>"+$CurrentPassword 
         }
         defualt  { throw "Current setup password encoding unknown, exiting." }
     }
 
-    Write-Output "Setting Password..."
     Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Setup Password",$NewSetupPassword,$CurrentSetupPassword)).Return
 }
 
@@ -326,8 +329,9 @@ function Set-HpSetupPassword
 .EXAMPLE
    Get-TpmStatus -ComputerName "mycomputer.mydomain.org"
 .LINK
-    https://github.com/necromorph1024/HPTpmAndBitLocker
-    http://msdn.microsoft.com/en-us/library/windows/desktop/aa376484%28v=vs.85%29.aspx
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa376484%28v = vs.85%29.aspx
+    https://github.com/PowerShellSith
+    Twitter: @PowerShellSith
 #>
 function Get-TpmStatus 
 {
@@ -336,10 +340,10 @@ function Get-TpmStatus
     Param 
     (
         # ComputerName, Type string, System to evaluate TPM against.
-        [Parameter(Position=0,
-                   ValueFromPipeline=$true)]
+        [Parameter(Position = 0,
+                   ValueFromPipeline = $true)]
         [string[]]
-        $ComputerName=$env:COMPUTERNAME
+        $ComputerName = $env:COMPUTERNAME
     )
 
     if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
@@ -349,7 +353,7 @@ function Get-TpmStatus
 
     try 
     {
-        $tpm=Get-WmiObject -Class Win32_Tpm -Namespace "root\CIMV2\Security\MicrosoftTpm" -ComputerName $ComputerName -ErrorAction Stop
+        $tpm = Get-WmiObject -Class Win32_Tpm -Namespace "root\CIMV2\Security\MicrosoftTpm" -ComputerName $ComputerName -ErrorAction Stop
     }
     catch 
     {
@@ -358,26 +362,26 @@ function Get-TpmStatus
 
     if (-not($tpm.IsEnabled_InitialValue)) 
     {
-        $enabled="No"
+        $enabled = "No"
     }
     else
     {
-        $enabled="Yes"
+        $enabled = "Yes"
     }
     
     if (-not($tpm.IsActivated_InitialValue))
     {
-        $activated="No"
+        $activated = "No"
     }
     else 
     {
-        $activated="Yes"
+        $activated = "Yes"
     }
 
-    $tpmStatus=[PSCustomObject] @{
-                                      'Enabled'  =$enabled
-                                      'Activated'=$activated
-                                 }
+    $tpmStatus = [PSCustomObject] @{
+                                        'Enabled'   = $enabled
+                                        'Activated' = $activated
+                                   }
     return $tpmStatus
 }
 
@@ -394,34 +398,35 @@ function Get-TpmStatus
 .EXAMPLE
     Invoke-HpTpm -SetupPassword "ABCD1234" -RestartComputer -RestartDelay 30
 .LINK
-    https://github.com/necromorph1024/HPTpmAndBitLocker
+    https://github.com/PowerShellSith
+    Twitter: @PowerShellSith
 #>
 function Invoke-HpTpm
 {
-    [CmdletBinding(DefaultParametersetName="None")]
+    [CmdletBinding()]
     [OutputType([void])]
     Param
     (
         # ComputerName, Type string, The HP Computer to enable and configure TPM.
-        [Parameter(Position=0,
-                   ValueFromPipeline=$true)]
+        [Parameter(Position = 0,
+                   ValueFromPipeline = $true)]
         [string[]]
-        $ComputerName=$env:ComputerName,
+        $ComputerName = $env:ComputerName,
 
         # Password, Type string, The current Setup Password of the system Bios.
-        [Parameter(Mandatory=$true,
-                   Position=1)]
+        [Parameter(Mandatory = $true,
+                   Position = 1)]
         [string]
         $Password,
 
         # RestartComputer, Type switch, Boolean value that determines to reboot the pc.
-        [Parameter(ParameterSetName="Overload")]
+        [Parameter(ParameterSetName = "Overload")]
         [switch]
         $RestartComputer,
 
         # RestartDelay, Type int, The amount of time in seconds before the computer restarts, must be specified if the $RestartComputer switch is used.
-        [Parameter(ParameterSetName="Overload",
-                   Mandatory=$true)]
+        [Parameter(ParameterSetName = "Overload",
+                   Mandatory = $true)]
         [ValidateRange(0,86400)]
         [int]
         $RestartDelay
@@ -432,13 +437,13 @@ function Invoke-HpTpm
         throw "The Bios Setup Password must be set before this cmdlet can be used."
     }
 
-    $hpBios=Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
-    $hpBiosSettings=Get-WmiObject -Class HPBIOS_BIOSSettingInterface -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction stop
+    $hpBios = Get-WmiObject -Class HP_BiosSetting -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction Stop
+    $hpBiosSettings = Get-WmiObject -Class HPBIOS_BIOSSettingInterface -Namespace "root\HP\InstrumentedBIOS" -ComputerName $ComputerName -ErrorAction stop
         
     switch (($hpBios | ?{ $_.Name -eq "Setup Password" }).SupportedEncoding)
     {
-        "kbd"    { $SetupPassword="<kbd/>"+(Convert-ToKbdString -UnicodeString $Password) }
-        "utf-16" { $SetupPassword="<utf-16/>"+$Password }
+        "kbd"    { $SetupPassword = "<kbd/>"+(Convert-ToKbdString -UnicodeString $Password) }
+        "utf-16" { $SetupPassword = "<utf-16/>"+$Password }
         defualt  { throw "Setup password encoding unknown, exiting." }
     }
 
@@ -515,8 +520,9 @@ function Invoke-HpTpm
     If no drive letter is specified, the default system drive will be used.
     The drive letter must be followed with a double colon.  IE: "C:".
 .LINK
-    https://github.com/necromorph1024/HPTpmAndBitLocker
-    http://msdn.microsoft.com/en-us/library/windows/desktop/aa376483%28v=vs.85%29.aspx
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa376483%28v = vs.85%29.aspx
+    https://github.com/PowerShellSith
+    Twitter: @PowerShellSith
 #>
 function Get-BitLockerStatus 
 {    
@@ -525,14 +531,14 @@ function Get-BitLockerStatus
     Param
     (
         # ComputerName, Type string, System to evaluate BitLocker against.
-        [Parameter(Position=0,
-                   ValueFromPipeline=$true)]
+        [Parameter(Position = 0,
+                   ValueFromPipeline = $true)]
         [string[]]
-        $ComputerName=$env:COMPUTERNAME,
+        $ComputerName = $env:COMPUTERNAME,
 
         # DriveLetter, Type string, Drive letter to evaluate BitLocker against.  if NullOrEmpty the default SystemDrive will be used.
-        [Parameter(Position=1,
-                   HelpMessage="Drive letter format must be letter followed by colon, 'C:'")]
+        [Parameter(Position = 1,
+                   HelpMessage = "Drive letter format must be letter followed by colon, 'C:'")]
         [ValidatePattern('[a-zA-Z]:')]
         [string]
         $DriveLetter
@@ -547,8 +553,8 @@ function Get-BitLockerStatus
     {
         try 
         {
-            $drive=Get-WmiObject Win32_OperatingSystem -Namespace "root\CIMV2" -ComputerName $ComputerName -Property SystemDrive -ErrorAction Stop
-            $volume=Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$($drive.SystemDrive)'" -ComputerName $ComputerName -ErrorAction Stop
+            $drive = Get-WmiObject Win32_OperatingSystem -Namespace "root\CIMV2" -ComputerName $ComputerName -Property SystemDrive -ErrorAction Stop
+            $volume = Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter  =  '$($drive.SystemDrive)'" -ComputerName $ComputerName -ErrorAction Stop
         }
         catch 
         {
@@ -557,40 +563,40 @@ function Get-BitLockerStatus
     }
     else 
     {
-        $volume=Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
+        $volume = Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter  =  '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
         if ($volume -eq $null) 
         {
             throw "Failed to enumarate the Win32_EncryptableVolume Namespace for $DriveLetter.  Please make sure the drive letter is correct and that the volume is accessable."
         }
     }
 
-    $status=$volume.GetConversionStatus()
+    $status = $volume.GetConversionStatus()
     switch ($status.ConversionStatus) 
     {
-        0 { $state="FullyDecrypted" }
-        1 { $state="FullyEncrypted" }
-        2 { $state="EncryptionInProgress" }
-        3 { $state="DecryptionInProgress" }
-        4 { $state="EncryptionPaused" }
-        5 { $state="DecryptionPaused" }
+        0 { $state = "FullyDecrypted" }
+        1 { $state = "FullyEncrypted" }
+        2 { $state = "EncryptionInProgress" }
+        3 { $state = "DecryptionInProgress" }
+        4 { $state = "EncryptionPaused" }
+        5 { $state = "DecryptionPaused" }
     }
 
-    $percentage=$status.EncryptionPercentage
+    $percentage = $status.EncryptionPercentage
 
     if ($volume.GetProtectionStatus().ProtectionStatus -eq 0) 
     {
-        $protection="ProtectionOff"
+        $protection = "ProtectionOff"
     }
     else 
     {
-        $protection="ProtectionOn"
+        $protection = "ProtectionOn"
     }
 
-    $bdeStatus=[PSCustomObject] @{
-                                      'Protection'=$protection
-                                      'State'     =$state
-                                      'Percentage'=$percentage
-                                 }
+    $bdeStatus = [PSCustomObject] @{
+                                        'Protection' = $protection
+                                        'State'      = $state
+                                        'Percentage' = $percentage
+                                   }
     return $bdeStatus
 }
 
@@ -609,9 +615,10 @@ function Get-BitLockerStatus
     This function will resume encryption if currently paused, or suspended.
     If used outside of the scope of this module, the Get-TpmStatus and Get-BitLockerStatus cmdlets are required.
 .LINK
-    https://github.com/necromorph1024/HPTpmAndBitLocker
-    http://msdn.microsoft.com/en-us/library/windows/desktop/aa376483%28v=vs.85%29.aspx
-    http://technet.microsoft.com/en-us/library/dd875529%28v=ws.10%29.aspx
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa376483%28v = vs.85%29.aspx
+    http://technet.microsoft.com/en-us/library/dd875529%28v = ws.10%29.aspx
+    https://github.com/PowerShellSith
+    Twitter: @PowerShellSith
 #>
 function Invoke-BitLockerWithTpmAndNumricalKeyProtectors 
 {    
@@ -620,20 +627,20 @@ function Invoke-BitLockerWithTpmAndNumricalKeyProtectors
     Param
     (
         # ComputerName, Type string, System to invoke BitLocker against.
-        [Parameter(Position=0,
-                   ValueFromPipeline=$true)]
+        [Parameter(Position = 0,
+                   ValueFromPipeline = $true)]
         [string[]]
-        $ComputerName=$env:COMPUTERNAME,
+        $ComputerName = $env:COMPUTERNAME,
 
         # DriveLetter, Type string, Drive letter to invoke BitLocker against.  if NullOrEmpty the SystemDrive will be used.
-        [Parameter(Position=1)]
+        [Parameter(Position = 1)]
         [ValidatePattern('[a-zA-Z]:')]
         [string]$DriveLetter,
 
         # ADKeyBackup, Type switch, Backups recovery information to the AD DS Object.
-        [Parameter(position=2)]
+        [Parameter(position = 2)]
         [switch]
-        $ADKeyBackup=$false
+        $ADKeyBackup = $false
     )
 
     if (-not(Get-TpmStatus -ComputerName $ComputerName).Enabled -eq "Yes" -or (-not(Get-TpmStatus -ComputerName $ComputerName).Activated -eq "Yes"))
@@ -641,14 +648,14 @@ function Invoke-BitLockerWithTpmAndNumricalKeyProtectors
         throw "The Tpm is not properly configured to use as a Key Protector for BitLocker Drive Encryption."
     }
 
-    $tpm=Get-WmiObject -Class Win32_Tpm -Namespace "root\CIMV2\Security\MicrosoftTpm" -ComputerName $ComputerName -ErrorAction Stop
+    $tpm = Get-WmiObject -Class Win32_Tpm -Namespace "root\CIMV2\Security\MicrosoftTpm" -ComputerName $ComputerName -ErrorAction Stop
     if (-not($tpm.IsOwned_InitialValue)) 
     {
-        $charArray="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray()
-        $random=""
-        for ($x=0; $x -lt 15; $x++) 
+        $charArray = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray()
+        $random = ""
+        for ($x = 0; $x -lt 15; $x++) 
         {
-            $random+=$charArray | Get-Random
+            $random += $charArray | Get-Random
         }
         $tpm.TakeOwnership($tpm.ConvertToOwnerAuth($random).OwnerAuth) | Out-Null
     }
@@ -657,8 +664,8 @@ function Invoke-BitLockerWithTpmAndNumricalKeyProtectors
     {
         try 
         {
-            $drive=Get-WmiObject Win32_OperatingSystem -Namespace "root\CIMV2" -ComputerName $ComputerName -Property SystemDrive -ErrorAction Stop
-            $volume=Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$($drive.SystemDrive)'" -ComputerName $ComputerName -ErrorAction Stop
+            $drive = Get-WmiObject Win32_OperatingSystem -Namespace "root\CIMV2" -ComputerName $ComputerName -Property SystemDrive -ErrorAction Stop
+            $volume = Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter  =  '$($drive.SystemDrive)'" -ComputerName $ComputerName -ErrorAction Stop
         }
         catch 
         {
@@ -667,7 +674,7 @@ function Invoke-BitLockerWithTpmAndNumricalKeyProtectors
     }
     else 
     {
-        $volume=Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter = '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
+        $volume = Get-WmiObject -Class Win32_EncryptableVolume -Namespace "root\CIMV2\Security\MicrosoftVolumeEncryption" -Filter "DriveLetter  =  '$DriveLetter'" -ComputerName $ComputerName -ErrorAction Stop
         if ($volume -eq $null) 
         {
             throw "Failed to enumarate the Win32_EncryptableVolume Namespace for $DriveLetter.  Please make sure the drive letter is correct and that the volume is accessable."

@@ -29,7 +29,7 @@ Also, the BiosConfigurationUtility from HP is even more cumbersome, with the ver
 	
 I have included a function script in the .\Scripts Directory that will get unencrypted PCs from a CCM database so you can foreach this function on the systems and enforce BDE.
 
-	[string[]]$unEncryptedWorkStations=powershell ". .\Scripts\Get-UnEncryptedWorkstations.ps1; Get-UnEncryptedWorkstations -SqlServer SCCM_DB_Server -Database CM_ABC -IntergratedSecurity"
+	[string[]]$unEncryptedWorkStations=powershell ". .\Scripts\Get-UnEncryptedWorkstationsFromCCMDB.ps1; Get-UnEncryptedWorkstationsFromCCMDB -SqlServer SCCM_DB_Server -Database CM_ABC -IntergratedSecurity"
 	
 	foreach ($computer in $unEncryptedWorkStations)
 	{
@@ -37,4 +37,5 @@ I have included a function script in the .\Scripts Directory that will get unenc
 	}
 	
 **UPDATE**
+
 I have added a second script in the .\Scripts Directory called Enforce-Bde.ps1 that has a full enforcement and logging, just sent the params for your Logs Directory and for your ConfigMgr SQL Server.

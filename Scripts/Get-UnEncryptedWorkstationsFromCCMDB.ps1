@@ -67,41 +67,41 @@ function Get-UnEncryptedWorkstationsFromCCMDB
     }
 
     $sqlCMD=New-Object System.Data.SqlClient.SqlCommand
-    $sqlCMD.CommandText="with ct_CollectedFiles (FileName,ClientID) as
-                        (select   dbo.CollectedFiles.FileName,
-		                          dbo.CollectedFiles.ClientID
-                         from     dbo.CollectedFiles),
+    $sqlCMD.CommandText = "with ct_CollectedFiles (FileName,ClientID) as
+                          (select   dbo.CollectedFiles.FileName,
+		                            dbo.CollectedFiles.ClientID
+                           from     dbo.CollectedFiles),
 
-                        ct_Everything (ComputerName,DriveLetter,BitLockerStatus) as
-                        (select   dbo.Computer_System_DATA.Name00                       as ComputerName,
-                                  left(dbo.Operating_System_DATA.SystemDirectory00, 2)  as DriveLetter,
-	                              case dbo.ENCRYPTABLE_VOLUME_DATA.ProtectionStatus00
-		                               when '1' then 'Enabled'
-			                           when '0' then case ct_CollectedFiles.FileName
-							                              when 'Original System Loader' then 'Enabled'
-							                              else 'Disabled or Suspended'
-							                         end
-	                              end                                                   as BitLockerStatus
-                         from     dbo.Operating_System_DATA
-	                         join dbo.ENCRYPTABLE_VOLUME_DATA on dbo.Operating_System_DATA.MachineID = dbo.ENCRYPTABLE_VOLUME_DATA.MachineID
-	                         join dbo.Computer_System_DATA    on dbo.Operating_System_DATA.MachineID = dbo.Computer_System_DATA.MachineID
-	                         left join ct_CollectedFiles      on dbo.Operating_System_DATA.MachineID = ct_CollectedFiles.ClientID
-                         where    dbo.ENCRYPTABLE_VOLUME_DATA.DriveLetter00 = left(dbo.Operating_System_DATA.SystemDirectory00, 2)
-                             and  dbo.Operating_System_Data.ProductType00 <> '3'
-	                         and  dbo.Computer_System_DATA.Manufacturer00 not like '%VMware, Inc.%' and dbo.Computer_System_DATA.Manufacturer00 not like '%Xen%')
+                          ct_Everything (ComputerName,DriveLetter,BitLockerStatus) as
+                          (select   dbo.Computer_System_DATA.Name00                       as ComputerName,
+                                    left(dbo.Operating_System_DATA.SystemDirectory00, 2)  as DriveLetter,
+	                                case dbo.ENCRYPTABLE_VOLUME_DATA.ProtectionStatus00
+		                                 when '1' then 'Enabled'
+			                             when '0' then case ct_CollectedFiles.FileName
+							                                when 'Original System Loader' then 'Enabled'
+							                                else 'Disabled or Suspended'
+							                           end
+	                                end                                                     as BitLockerStatus
+                           from     dbo.Operating_System_DATA
+	                           join dbo.ENCRYPTABLE_VOLUME_DATA on dbo.Operating_System_DATA.MachineID = dbo.ENCRYPTABLE_VOLUME_DATA.MachineID
+	                           join dbo.Computer_System_DATA    on dbo.Operating_System_DATA.MachineID = dbo.Computer_System_DATA.MachineID
+	                           left join ct_CollectedFiles      on dbo.Operating_System_DATA.MachineID = ct_CollectedFiles.ClientID
+                           where    dbo.ENCRYPTABLE_VOLUME_DATA.DriveLetter00 = left(dbo.Operating_System_DATA.SystemDirectory00, 2)
+                               and  dbo.Operating_System_Data.ProductType00 <> '3'
+	                           and  dbo.Computer_System_DATA.Manufacturer00 not like '%VMware, Inc.%' and dbo.Computer_System_DATA.Manufacturer00 not like '%Xen%')
 
-                        select    *
-                        from      ct_Everything
-                        where     BitLockerStatus = 'Disabled or Suspended'
-                        order by  'ComputerName' asc"
+                          select    *
+                          from      ct_Everything
+                          where     BitLockerStatus = 'Disabled or Suspended'
+                          order by  'ComputerName' asc"
     $sqlCMD.Connection = $sqlConnection
 
-    $results=$sqlCMD.ExecuteReader()
+    $results = $sqlCMD.ExecuteReader()
     If ($results.HasRows)
     {
         While ($results.Read())
         {
-            $workstations+=@($results["ComputerName"])
+            $workstations += @($results["ComputerName"])
         }
         return $workstations
     }

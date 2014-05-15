@@ -6,7 +6,7 @@
 .EXAMPLE
     Out-HPVerboseReturnValues -WmiMethodReturnValue 0
 .EXAMPLE
-    Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Setup Password"," ",$SetupPassword))
+    Out-HPVerboseReturnValues -WmiMethodReturnValue ((Get-WmiObject -Class HPBIOS_BIOSSettingInterface -Namespace "root\HP\InstrumentedBIOS").SetBIOSSetting("Setup Password"," ","MyPassword"))
 .LINK
     http://h20331.www2.hp.com/HPsub/downloads/cmi_whitepaper.pdf  Page: 14
     https://github.com/PowerShellSith
@@ -44,7 +44,7 @@ function Out-HPVerboseReturnValues
 .SYNOPSIS
     Converts string to KBD encoded string.
 .DESCRIPTION
-    Converts UTF16 string to Keyboard Scan Hex Value (KBD).  Older HP BIOS's only accept this encoding method for setup passwords, usful for WMI BIOS Administration.
+    Converts UTF16 string to Keyboard Scan Hex Value (KBD).  Older HP BIOS's only accept this encoding method for setup passwords, useful for WMI BIOS Administration.
 .EXAMPLE
     ConvertTo-KBDString -UnicodeString "MyStringToConvert"
 .LINK
@@ -179,7 +179,7 @@ function ConvertTo-KBDString
 .SYNOPSIS
     Gets the current state of the setup password.  It is not possiable to return the current setup password value.
 .DESCRIPTION
-    This function will determine if the password is set on the system, automation of Bios Settings cannot be used until the password is set.
+    This function will determine if the password is set on the system, automation of BIOS Settings cannot be used until the password is set.
 .EXAMPLE
     Get-HPSetupPasswordIsSet
 .EXAMPLE

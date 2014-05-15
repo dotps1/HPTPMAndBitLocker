@@ -31,7 +31,7 @@ function Write-LogEntry
 
 Import-Module HPTPMAndBitLocker
 $password = powershell ". .\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"
-$log = ".\Logs\"+(Get-Date -Format yyyyMMdd)+"_Enforce-Bde.ps1.log"
+$log = ".\Logs\"+(Get-Date -Format yyyyMMdd)+"_Enforce-BDE.ps1.log"
 [string[]]$unEncryptedWorkStations = powershell ". .\Scripts\Get-UnEncryptedWorkstationsFromCCMDB.ps1; Get-UnEncryptedWorkstationsFromCCMDB -SqlServer SQL_SERVER_HERE -Database CM_SITE_CODE -IntergratedSecurity"
 
 Write-LogEntry -Path $log -Event "####################################"

@@ -4,15 +4,15 @@
 .DESCRIPTION
     Converts the return values from the .SetBIOSSetting() WMI Method to user firendly verbose output.
 .EXAMPLE
-    Out-HpVerboseReturnValues -WmiMethodReturnValue 0
+    Out-HPVerboseReturnValues -WmiMethodReturnValue 0
 .EXAMPLE
-    Out-HpVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Setup Password"," ",$SetupPassword))
+    Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Setup Password"," ",$SetupPassword))
 .LINK
-    http://h20331.www2.hp.com/Hpsub/downloads/cmi_whitepaper.pdf  Page: 14
+    http://h20331.www2.hp.com/HPsub/downloads/cmi_whitepaper.pdf  Page: 14
     https://github.com/PowerShellSith
     Twitter: @PowerShellSith
 #>
-function Out-HpVerboseReturnValues
+function Out-HPVerboseReturnValues
 {
     [CmdletBinding()]
     [OutputType([string])]
@@ -46,15 +46,15 @@ function Out-HpVerboseReturnValues
 .DESCRIPTION
     Converts UTF16 string to Keyboard Scan Hex Value (KBD).  Older HP BIOS's only accept this encoding method for setup passwords, usful for WMI BIOS Administration.
 .EXAMPLE
-    Convert-ToKbdString -UnicodeString "MyStringToConvert"
+    ConvertTo-KBDString -UnicodeString "MyStringToConvert"
 .LINK
     http://www.codeproject.com/Articles/7305/Keyboard-Events-Simulation-using-keybd_event-funct
     http://msdn.microsoft.com/en-us/library/aa299374%28v = vs.60%29.aspx
-    http://h20331.www2.hp.com/Hpsub/downloads/cmi_whitepaper.pdf  Page: 14
+    http://h20331.www2.hp.com/HPsub/downloads/cmi_whitepaper.pdf  Page: 14
     https://github.com/PowerShellSith
     Twitter: @PowerShellSith
 #>
-function Convert-ToKbdString 
+function ConvertTo-KBDString
 {
     [CmdletBinding()]
     [OutputType([string])]
@@ -146,7 +146,7 @@ function Convert-ToKbdString
     $kbdHexVals.")" = "8B"
     $kbdHexVals."-" = "0C"
     $kbdHexVals."_" = "8C"
-    $kbdHexVals." = " = "0D"
+    $kbdHexVals."=" = "0D"
     $kbdHexVals."+" = "8D"
     $kbdHexVals."[" = "1A"
     $kbdHexVals."{" = "9A"
@@ -181,14 +181,14 @@ function Convert-ToKbdString
 .DESCRIPTION
     This function will determine if the password is set on the system, automation of Bios Settings cannot be used until the password is set.
 .EXAMPLE
-    Get-HpSetupPasswordIsSet
+    Get-HPSetupPasswordIsSet
 .EXAMPLE
-    Get-HpSetupPasswordIsSet -ComputerName "mycomputer.mydomain.org"
+    Get-HPSetupPasswordIsSet -ComputerName "mycomputer.mydomain.org"
 .LINK
     https://github.com/PowerShellSith
     Twitter: @PowerShellSith
 #>
-function Get-HpSetupPasswordIsSet
+function Get-HPSetupPasswordIsSet
 {
     [CmdletBinding()]
     [OutputType([bool])]
@@ -234,21 +234,21 @@ function Get-HpSetupPasswordIsSet
 
 <#
 .SYNOPSIS
-    Sets the Setup Password on an HP Bios.
+    Sets the Setup Password on an Hewlett-Packard Bios.
 .DESCRIPTION
     This function can be used to set a password on the Bios, it can also be used to clear the password, the current password is needed to change the value.
     If a new value is being set, and not cleared, it must be between 8 and 30 characters.
 .EXAMPLE
-    Set-HpSetupPassword -NewSetupPassword "MyNewPassword"
+    Set-HPSetupPassword -NewSetupPassword "MyNewPassword"
 .EXAMPLE
-    Set-HpSetupPassword -ComputerName "mycomputer.mydomain.org" -NewSetupPassword " " -CurrentSetupPassword "MyCurrentPassword"
+    Set-HPSetupPassword -ComputerName "mycomputer.mydomain.org" -NewSetupPassword " " -CurrentSetupPassword "MyCurrentPassword"
 .EXAMPLE
-    Set-HpSetupPassword -NewSetupPassword "MyNewSetupPassword" -CurrentSetupPassword "MyCurrentPassword"
+    Set-HPSetupPassword -NewSetupPassword "MyNewSetupPassword" -CurrentSetupPassword "MyCurrentPassword"
 .LINK
     https://github.com/PowerShellSith
     Twitter: @PowerShellSith
 #>
-function Set-HpSetupPassword
+function Set-HPSetupPassword
 {
     [CmdletBinding()]
     [OutputType([void])]
@@ -305,8 +305,8 @@ function Set-HpSetupPassword
     {
         "kbd"
         { 
-            $NewSetupPassword = "<kbd/>"+(Convert-ToKbdString -UnicodeString $NewPassword) 
-            $CurrentSetupPassword = "<kbd/>"+(Convert-ToKbdString -UnicodeString $CurrentPassword) 
+            $NewSetupPassword = "<kbd/>"+(ConvertTo-KBDString -UnicodeString $NewPassword) 
+            $CurrentSetupPassword = "<kbd/>"+(ConvertTo-KBDString -UnicodeString $CurrentPassword) 
         }
         "utf-16"
         { 
@@ -325,15 +325,15 @@ function Set-HpSetupPassword
 .DESCRIPTION
    Tests the status of the Trusted Platform Module, only returns true if both enabled and activated.
 .EXAMPLE
-   Get-TpmStatus
+   Get-TPMStatus
 .EXAMPLE
-   Get-TpmStatus -ComputerName "mycomputer.mydomain.org"
+   Get-TPMStatus -ComputerName "mycomputer.mydomain.org"
 .LINK
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376484%28v = vs.85%29.aspx
     https://github.com/PowerShellSith
     Twitter: @PowerShellSith
 #>
-function Get-TpmStatus 
+function Get-TPMStatus 
 {
     [CmdletBinding()]
     [OutputType([PSobject])]
@@ -353,11 +353,11 @@ function Get-TpmStatus
 
     try 
     {
-        $tpm = Get-WmiObject -Class Win32_Tpm -Namespace "root\CIMV2\Security\MicrosoftTpm" -ComputerName $ComputerName -ErrorAction Stop
+        $tpm = Get-WmiObject -Class Win32_TPM -Namespace "root\CIMV2\Security\MicrosoftTPM" -ComputerName $ComputerName -ErrorAction Stop
     }
     catch 
     {
-        throw "Failed to connect to the Win32_Tpm Namespace, You may not have sufficent rights."
+        throw "Failed to connect to the Win32_TPM Namespace, You may not have sufficent rights."
     }
 
     if (-not($tpm.IsEnabled_InitialValue)) 
@@ -392,16 +392,16 @@ function Get-TpmStatus
     Enables and configures the required settings of the TPM in order to use the TPM Protector Type for BitLocker drive encryption.
     A system restart is required to complete this action, the default delay of this timer is 30 seconds if the restart switch is used.
 .EXAMPLE
-    Invoke-HpTpm -SetupPassword "MyPassword"
+    Invoke-HPTPM -SetupPassword "MyPassword"
 .EXAMPLE
-    Invoke-HpTpm -ComputerName "mycomputer.mydomain.org" -SetupPassword "MyPassword"
+    Invoke-HPTPM -ComputerName "mycomputer.mydomain.org" -SetupPassword "MyPassword"
 .EXAMPLE
-    Invoke-HpTpm -SetupPassword "ABCD1234" -RestartComputer -RestartDelay 30
+    Invoke-HPTPM -SetupPassword "ABCD1234" -RestartComputer -RestartDelay 30
 .LINK
     https://github.com/PowerShellSith
     Twitter: @PowerShellSith
 #>
-function Invoke-HpTpm
+function Invoke-HPTPM
 {
     [CmdletBinding()]
     [OutputType([void])]
@@ -442,7 +442,7 @@ function Invoke-HpTpm
         
     switch (($hpBios | ?{ $_.Name -eq "Setup Password" }).SupportedEncoding)
     {
-        "kbd"    { $SetupPassword = "<kbd/>"+(Convert-ToKbdString -UnicodeString $Password) }
+        "kbd"    { $SetupPassword = "<kbd/>"+(ConvertTo-KBDString -UnicodeString $Password) }
         "utf-16" { $SetupPassword = "<utf-16/>"+$Password }
         defualt  { throw "Setup password encoding unknown, exiting." }
     }
@@ -454,7 +454,7 @@ function Invoke-HpTpm
     }
     elseif (($hpBios | ?{ $_.Name -eq "Embedded Security Device Availability" }) -ne $null)
     {
-        Out-HpVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Device Availability","Available",$SetupPassword)).Return
+        Out-HPVerboseReturnValues -WmiMethodReturnValue ($hpBiosSettings.SetBIOSSetting("Embedded Security Device Availability","Available",$SetupPassword)).Return
     }
     elseif (($hpBios | ?{ $_.Name -eq "TPM Device" }) -ne $null)
     {
@@ -503,7 +503,7 @@ function Invoke-HpTpm
 
     if ($RestartComputer)
     {
-        shutdown.exe -f -r -t $RestartDelay -m $ComputerName -c "A reboot is required to complete the invocation of the Tpm."
+        shutdown.exe -f -r -t $RestartDelay -m $ComputerName -c "A reboot is required to complete the invocation of the TPM."
     }
 }
 
@@ -607,20 +607,20 @@ function Get-BitLockerStatus
     Invokes BitLocker Drive Encryption on an Encryptable Volume with a TPM and Numrical Password Key Protectors.
     If the Trusted Platform Module is not currently owned, ownership will be taken with randomized 15 character password.
 .EXAMPLE
-    Invoke-BitLockerWithTpmAndNumricalKeyProtectors
+    Invoke-BitLockerWithTPMAndNumricalKeyProtectors
 .EXAMPLE
-    Invoke-BitLockerWithTpmAndNumricalKeyProtectors -ComputerName "mycomputer.mydomain.org" -DriveLetter C: -ADKeyBackup $false
+    Invoke-BitLockerWithTPMAndNumricalKeyProtectors -ComputerName "mycomputer.mydomain.org" -DriveLetter C: -ADKeyBackup $false
 .NOTES
     ADKeyBackup switch requires proper TPM ACL Delegation in Active Directory to be used.
     This function will resume encryption if currently paused, or suspended.
-    If used outside of the scope of this module, the Get-TpmStatus and Get-BitLockerStatus cmdlets are required.
+    If used outside of the scope of this module, the Get-TPMStatus and Get-BitLockerStatus cmdlets are required.
 .LINK
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376483%28v = vs.85%29.aspx
     http://technet.microsoft.com/en-us/library/dd875529%28v = ws.10%29.aspx
     https://github.com/PowerShellSith
     Twitter: @PowerShellSith
 #>
-function Invoke-BitLockerWithTpmAndNumricalKeyProtectors 
+function Invoke-BitLockerWithTPMAndNumricalKeyProtectors 
 {    
     [CmdletBinding()]
     [OutputType([void])] 
@@ -643,12 +643,12 @@ function Invoke-BitLockerWithTpmAndNumricalKeyProtectors
         $ADKeyBackup = $false
     )
 
-    if (-not(Get-TpmStatus -ComputerName $ComputerName).Enabled -eq "Yes" -or (-not(Get-TpmStatus -ComputerName $ComputerName).Activated -eq "Yes"))
+    if (-not(Get-TPMStatus -ComputerName $ComputerName).Enabled -eq "Yes" -or (-not(Get-TPMStatus -ComputerName $ComputerName).Activated -eq "Yes"))
     {
-        throw "The Tpm is not properly configured to use as a Key Protector for BitLocker Drive Encryption."
+        throw "The TPM is not properly configured to use as a Key Protector for BitLocker Drive Encryption."
     }
 
-    $tpm = Get-WmiObject -Class Win32_Tpm -Namespace "root\CIMV2\Security\MicrosoftTpm" -ComputerName $ComputerName -ErrorAction Stop
+    $tpm = Get-WmiObject -Class Win32_TPM -Namespace "root\CIMV2\Security\MicrosoftTPM" -ComputerName $ComputerName -ErrorAction Stop
     if (-not($tpm.IsOwned_InitialValue)) 
     {
         $charArray = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray()

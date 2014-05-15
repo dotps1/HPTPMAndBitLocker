@@ -29,7 +29,7 @@ function Write-LogEntry
     Add-Content $Path -Value ((Get-Date).ToLongDateString()+" "+(Get-Date).ToLongTimeString()+": "+$Event)
 }
 
-Import-Module HpTpmAndBitLocker
+Import-Module HPTPMAndBitLocker
 $password = powershell ". .\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"
 $log = ".\Logs\"+(Get-Date -Format yyyyMMdd)+"_Enforce-Bde.ps1.log"
 [string[]]$unEncryptedWorkStations = powershell ". .\Scripts\Get-UnEncryptedWorkstationsFromCCMDB.ps1; Get-UnEncryptedWorkstationsFromCCMDB -SqlServer SQL_SERVER_HERE -Database CM_SITE_CODE -IntergratedSecurity"
@@ -50,11 +50,24 @@ foreach ($computer in $unEncryptedWorkStations)
     else
     {
         Write-LogEntry -Path $log -Event "Successfully contacted $computer."
+        
+        Write-LogEntry -Path $log -Event "Testing for TrueCrypt Disk Encryption on $computer..."
+        if (Test-Path "$env:ProgramData\TrueCrypt\Orginal System Loader")
+        {
+            $SMSCli=[wmiclass]"\\$computer\root\ccm:SMS_Client"
+            $SMSCli.TriggerSchedule("{00000000-0000-0000-0000-000000000002}") | Out-Null
+            Write-LogEntry -Path $log -Event "Computer is fully encrypted with TrueCrypt Full Disk Encryption, triggering ccm software enventory cycle for $computer..."
+            break
+        }
+        else
+        {
+            Write-LogEntry -Path $log -Event "TrueCrypt Disk Encryption not detetected on $computer..."
+        }
         Write-LogEntry -Path $log -Event "Retrieving tpm status for $computer..."
         try
         {
-            Write-LogEntry -Path $log -Event ("Tpm enabled: "+(Get-TpmStatus -ComputerName $computer).Enabled) 
-            Write-LogEntry -Path $log -Event ("Tpm activated: "+(Get-TpmStatus -ComputerName $computer).Activated) 
+            Write-LogEntry -Path $log -Event ("TPM enabled: "+(Get-TPMStatus -ComputerName $computer).Enabled) 
+            Write-LogEntry -Path $log -Event ("TPM activated: "+(Get-TPMStatus -ComputerName $computer).Activated) 
         }
         catch
         {
@@ -62,22 +75,22 @@ foreach ($computer in $unEncryptedWorkStations)
             Continue
         }
 
-        if ((Get-TpmStatus -ComputerName $computer).Enabled -ne "Yes" -or (Get-TpmStatus -ComputerName $computer).Activated -ne "Yes")
+        if ((Get-TPMStatus -ComputerName $computer).Enabled -ne "Yes" -or (Get-TPMStatus -ComputerName $computer).Activated -ne "Yes")
         {
-            Write-LogEntry -Path $log -Event "Tpm is not properly configured on $computer."
+            Write-LogEntry -Path $log -Event "TPM is not properly configured on $computer."
             Write-LogEntry -Path $log -Event "Retrieving setup password state on $computer..."
             try
             {
-                if (-not(Get-HpSetupPasswordIsSet -ComputerName $computer))
+                if (-not(Get-HPSetupPasswordIsSet -ComputerName $computer))
                 {
                     Write-LogEntry -Path $log -Event "Setup password is set: False"
                     Write-LogEntry -Path $log -Event ("Generating password: "+($password=powershell ". .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"))
-                    Set-HpSetupPassword -ComputerName $computer -NewPassword $password | %{ Write-LogEntry -Path $log -Event $_ }
+                    Set-HPSetupPassword -ComputerName $computer -NewPassword $password | %{ Write-LogEntry -Path $log -Event $_ }
                 }
                 Write-LogEntry -Path $log -Event "Setup password is set: True"
-                Invoke-HpTpm -ComputerName $computer -Password $password | %{ Write-LogEntry -Path $log -Event $_ }
+                Invoke-HPTPM -ComputerName $computer -Password $password | %{ Write-LogEntry -Path $log -Event $_ }
                 Write-LogEntry -Path $log -Event "Removeing Setup password from $computer..."
-                Set-HpSetupPassword -ComputerName $computer -NewPassword " " -CurrentPassword $password | %{ Write-LogEntry -Path $log -Event $_ }
+                Set-HPSetupPassword -ComputerName $computer -NewPassword " " -CurrentPassword $password | %{ Write-LogEntry -Path $log -Event $_ }
                 Write-LogEntry -Path $log -Event "System reboot required to complete tpm configuration.  BitLocker will be enforced on next run after reboot."
             }
             catch
@@ -88,7 +101,7 @@ foreach ($computer in $unEncryptedWorkStations)
         }
         else
         {
-            Write-LogEntry -Path $log -Event "Tpm is properly configured on $computer."
+            Write-LogEntry -Path $log -Event "TPM is properly configured on $computer."
             Write-LogEntry -Path $log -Event "Retrieving bitlocker status on $computer..."
             Write-LogEntry -Path $log -Event ("Protection: "+(Get-BitLockerStatus -ComputerName $computer).Protection)
             Write-LogEntry -Path $log -Event ("State: "+(Get-BitLockerStatus -ComputerName $computer).State)
@@ -99,17 +112,11 @@ foreach ($computer in $unEncryptedWorkStations)
                 $SMSCli.TriggerSchedule("{00000000-0000-0000-0000-000000000001}") | Out-Null
                 Write-LogEntry -Path $log -Event "Computer is fully encrypted and protection is on, triggering ccm hardware inventory cycle for $computer..."
             }
-            elseif (Test-Path "$env:ProgramData\TrueCrypt\Orginal System Loader")
-            {
-                $SMSCli=[wmiclass]"\\$computer\root\ccm:SMS_Client"
-                $SMSCli.TriggerSchedule("{00000000-0000-0000-0000-000000000002}") | Out-Null
-                Write-LogEntry -Path $log -Event "Computer is fully encrypted with True Crypt Full Disk Encryption, triggering ccm software enventory cycle for $computer..."
-            }
             elseif ((Get-BitLockerStatus -ComputerName $computer).State -ne "EncryptionInProgress")
             {
                 Write-LogEntry -Path $log -Event "Invoking bitlocker drive encryption on $computer."
         
-                Invoke-BitLockerWithTpmAndNumricalKeyProtectors -ComputerName $computer -ADKeyBackup | Out-Null
+                Invoke-BitLockerWithTPMAndNumricalKeyProtectors -ComputerName $computer -ADKeyBackup | Out-Null
 
                 Write-LogEntry -Path $log -Event ("Protection: "+(Get-BitLockerStatus -ComputerName $computer).Protection)
                 Write-LogEntry -Path $log -Event ("State: "+(Get-BitLockerStatus -ComputerName $computer).State)

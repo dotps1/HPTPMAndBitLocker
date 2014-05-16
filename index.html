@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>HPTPMAndBitLocker by PowerShellSith</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>HPTPMAndBitLocker</h1>
+        <p>Custom Powershell Module to ease TPM and BitLocker Administration for HP Workstations</p>
+
+        <p class="view"><a href="https://github.com/PowerShellSith/HPTPMAndBitLocker">View the Project on GitHub <small>PowerShellSith/HPTPMAndBitLocker</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/PowerShellSith/HPTPMAndBitLocker/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/PowerShellSith/HPTPMAndBitLocker/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/PowerShellSith/HPTPMAndBitLocker">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h3>
+<a name="this-module-has-the-ability-to-modify-bios-settings-use-at-your-own-risk" class="anchor" href="#this-module-has-the-ability-to-modify-bios-settings-use-at-your-own-risk"><span class="octicon octicon-link"></span></a><em>THIS MODULE HAS THE ABILITY TO MODIFY BIOS SETTINGS USE AT YOUR OWN RISK</em>
+</h3>
+
+<p><strong>Highly customized BitLocker PowerShell Module for TPM Administration and BitLocker Administration for HP Workstations.</strong></p>
+
+<p>I have found the "MangeBde.exe" CLI tool a little cumbersome, so I am developing a "More Powerful" BitLocker Module.
+Also, the BiosConfigurationUtility from HP is even more cumbersome to manage TPM, with the verbiage being slightly different between models, I need model specific configuration files for every pc I manage.</p>
+
+<pre><code># Configure TPM on HP Models:
+Import-Module .\HPTpmAndBitLocker.psm1
+# Current Setup Password, if there is not a current password, one will randomly be generated, and removed after configuration completes.
+$password=""
+
+if (-not(Get-TPMStatus).Enabled -eq "Yes" -or (-not(Get-TPMStatus).Activated -eq "Yes"))
+{
+    if(-not(Get-HPSetupPasswordIsSet))
+    {
+        $password=powershell ". .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"
+        $randomPasswordUsed=$true
+        Set-HPSetupPassword -NewPassword $password
+    }
+
+    Invoke-HPTPM -Password $password
+
+    if ($randomPasswordUsed)
+    {
+        Set-HPSetupPassword -NewPassword " " -CurrentPassword $password
+    }
+}
+</code></pre>
+
+<p>I have included a function script in the .\Scripts Directory that will get unencrypted PCs from a CCM database so you can foreach this function on the systems and enforce BDE.</p>
+
+<pre><code>[string[]]$unEncryptedWorkStations=powershell ". .\Scripts\Get-UnEncryptedWorkstationsFromCCMDB.ps1; Get-UnEncryptedWorkstationsFromCCMDB -SqlServer SCCM_DB_Server -Database CM_ABC -IntergratedSecurity"
+
+foreach ($computer in $unEncryptedWorkStations)
+{
+    # do things.
+}
+</code></pre>
+
+<p><strong>UPDATE</strong></p>
+
+<p>I have added a second script in the .\Scripts Directory called Enforce-Bde.ps1 that has a full enforcement and logging, just sent the params for your Logs Directory and for your ConfigMgr SQL Server.  You need to enable BitLockerDrive status in your ConfigMgr Client Settings to use this Script.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/PowerShellSith">PowerShellSith</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>

@@ -19,9 +19,8 @@ function Out-HPVerboseReturnValues
     Param
     (
         # WmiMethodReturnValue, Type int, The Return Property Value to be converted to verbose output.
-        [Parameter(Mandatory = $true,
-                   Position = 0,
-                   ValueFromPipeline  =  $true)]
+        [Parameter(Mandatory=$true,
+                   ValueFromPipeline=$true)]
         [Alias("RetVal")]
         [int]
         $WmiMethodReturnValue
@@ -61,9 +60,8 @@ function ConvertTo-KBDString
     Param
     (
         # Input, Type string, String to be encoded with EN Keyboard Scan Code Hex Values.
-        [Parameter(Mandatory = $true,
-                   Position = 0,
-                   ValueFromPipeline = $true)]
+        [Parameter(Mandatory=$true,
+                   ValueFromPipeline=$true)]
         [Alias("UniStr")]
         [AllowEmptyString()]
         [string]
@@ -72,7 +70,7 @@ function ConvertTo-KBDString
 
     $kbdHexVals = New-Object System.Collections.Hashtable
 
-    $kbdHexVals."a"  =  "1E"
+    $kbdHexVals."a" = "1E"
     $kbdHexVals."b" = "30"
     $kbdHexVals."c" = "2E"
     $kbdHexVals."d" = "20"
@@ -195,16 +193,11 @@ function Get-HPSetupPasswordIsSet
     Param
     (
         # ComputerName, Type string, System to evaluate Setup Password state against.
-        [Parameter(Position = 0,
-                   ValueFromPipeline = $true)]
+        [Parameter(ValueFromPipeline=$true)]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } })]
         [string[]]
         $ComputerName = $env:COMPUTERNAME
     )
-
-    if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
-    {
-        throw "Failed to connect to $ComputerName.  Please ensure the system is available."
-    }
 
     try
     {
@@ -255,27 +248,23 @@ function Set-HPSetupPassword
     Param
     (
         # ComputerName, Type string, System to set Bios Setup Password.
-        [Parameter(Position = 0,
-                   ValueFromPipeline = $true)]
+        [Parameter(Position=0,
+                   ValueFromPipeline=$true)]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } })]
         [string[]]
         $ComputerName = $env:COMPUTERNAME,
 
         # NewPassword, Type string, The value of the password to be set.  The password can be cleared by using a space surrounded by double quotes, IE: " ".
-        [Parameter(Mandatory = $true,
-                   Position = 1)]
+        [Parameter(Mandatory=$true,
+                   Position=1)]
         [string]
         $NewPassword,
 
         # CurrentPassword, Type string, The value of the current setup password.
-        [Parameter(Position = 2)]
+        [Parameter(Position=2)]
         [string]
         $CurrentPassword
     )
-
-    if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
-    {
-        throw "Failed to connect to $ComputerName.  Please ensure the system is available."
-    }
 
     try
     {
@@ -340,16 +329,11 @@ function Get-TPMStatus
     Param 
     (
         # ComputerName, Type string, System to evaluate TPM against.
-        [Parameter(Position = 0,
-                   ValueFromPipeline = $true)]
+        [Parameter(ValueFromPipeline=$true)]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } })]
         [string[]]
         $ComputerName = $env:COMPUTERNAME
     )
-
-    if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
-    {
-        throw "Failed to connect to $ComputerName.  Please ensure the system is available."
-    }
 
     try 
     {
@@ -408,25 +392,25 @@ function Invoke-HPTPM
     Param
     (
         # ComputerName, Type string, The HP Computer to enable and configure TPM.
-        [Parameter(Position = 0,
-                   ValueFromPipeline = $true)]
+        [Parameter(Position=0,
+                   ValueFromPipeline=$true)]
         [string[]]
         $ComputerName = $env:ComputerName,
 
         # Password, Type string, The current Setup Password of the system Bios.
-        [Parameter(Mandatory = $true,
-                   Position = 1)]
+        [Parameter(Mandatory=$true,
+                   Position=1)]
         [string]
         $Password,
 
         # RestartComputer, Type switch, Boolean value that determines to reboot the pc.
-        [Parameter(ParameterSetName = "Overload")]
+        [Parameter(ParameterSetName="Overload")]
         [switch]
         $RestartComputer,
 
         # RestartDelay, Type int, The amount of time in seconds before the computer restarts, must be specified if the $RestartComputer switch is used.
-        [Parameter(ParameterSetName = "Overload",
-                   Mandatory = $true)]
+        [Parameter(ParameterSetName="Overload",
+                   Mandatory=$true)]
         [ValidateRange(0,86400)]
         [int]
         $RestartDelay
@@ -531,8 +515,9 @@ function Get-BitLockerStatus
     Param
     (
         # ComputerName, Type string, System to evaluate BitLocker against.
-        [Parameter(Position = 0,
-                   ValueFromPipeline = $true)]
+        [Parameter(Position=0,
+                   ValueFromPipeline=$true)]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } })]
         [string[]]
         $ComputerName = $env:COMPUTERNAME,
 
@@ -543,11 +528,6 @@ function Get-BitLockerStatus
         [string]
         $DriveLetter
     )
-
-    if (-not(Test-Connection -ComputerName $ComputerName -Quiet -Count 2)) 
-    {
-        throw "Failed to connect to $ComputerName.  Please ensure the system is available."
-    }
 
     if (-not($DriveLetter)) 
     {
@@ -627,18 +607,18 @@ function Invoke-BitLockerWithTPMAndNumricalKeyProtectors
     Param
     (
         # ComputerName, Type string, System to invoke BitLocker against.
-        [Parameter(Position = 0,
-                   ValueFromPipeline = $true)]
+        [Parameter(Position=0,
+                   ValueFromPipeline=$true)]
         [string[]]
-        $ComputerName = $env:COMPUTERNAME,
+        $ComputerName=$env:COMPUTERNAME,
 
         # DriveLetter, Type string, Drive letter to invoke BitLocker against.  if NullOrEmpty the SystemDrive will be used.
-        [Parameter(Position = 1)]
+        [Parameter(Position=1)]
         [ValidatePattern('[a-zA-Z]:')]
         [string]$DriveLetter,
 
         # ADKeyBackup, Type switch, Backups recovery information to the AD DS Object.
-        [Parameter(position = 2)]
+        [Parameter(position=2)]
         [switch]
         $ADKeyBackup = $false
     )

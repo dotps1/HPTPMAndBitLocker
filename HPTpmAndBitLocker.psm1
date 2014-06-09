@@ -392,19 +392,22 @@ function Invoke-HPTPM
     Param
     (
         # ComputerName, Type string, The HP Computer to enable and configure TPM.
-        [Parameter(Position=0,
+        [Parameter(ParameterSetName="Standard",
+                   Position=0,
                    ValueFromPipeline=$true)]
         [string[]]
         $ComputerName = $env:ComputerName,
 
         # Password, Type string, The current Setup Password of the system Bios.
-        [Parameter(Mandatory=$true,
+        [Parameter(ParameterSetName="Standard",
+                   Mandatory=$true,
                    Position=1)]
         [string]
         $Password,
 
         # RestartComputer, Type switch, Boolean value that determines to reboot the pc.
-        [Parameter(ParameterSetName="Overload")]
+        [Parameter(ParameterSetName="Overload",
+                   Mandatory=$false)]
         [switch]
         $RestartComputer,
 

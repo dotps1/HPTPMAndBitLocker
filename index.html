@@ -17,11 +17,7 @@
       <header>
         <h1>HPTPMAndBitLocker</h1>
         <p>Custom Powershell Module to ease TPM and BitLocker Administration for HP Workstations</p>
-		
-		<img src="/images/PowerShell.png" alt="PowerShell"</img>
 
-		<p><a href="https://twitter.com/PowerShellSith">Twitter</a></p>
-		
         <p class="view"><a href="https://github.com/PowerShellSith/HPTPMAndBitLocker">View the Project on GitHub <small>PowerShellSith/HPTPMAndBitLocker</small></a></p>
 
 
@@ -52,6 +48,7 @@ Also, the BiosConfigurationUtility from HP is even more cumbersome to manage TPM
 <li>Invoke-HPTPM</li>
 <li>Get-BitLockerStatus</li>
 <li>Invoke-BitLockerWithTPMAndNumricalKeyProtectors</li>
+<li>Get-UnEncryptedWorkstationsFromCCMDB</li>
 </ul><p>The first two functions are more for internal use of the module, the three HP tailored functions are <em>-HP</em> are tailored specifically for HP BIOS and TPM administration, essentially replacing the BiosConfigurationUtility usage TPM.  The remaining functions can be used on any workstation.</p>
 
 <pre><code># Configure TPM on HP Models:
@@ -78,11 +75,11 @@ if (-not(Get-TPMStatus).Enabled -eq "Yes" -or (-not(Get-TPMStatus).Activated -eq
 }
 </code></pre>
 
-<p>I have included a function script in the .\Scripts Directory that will get unencrypted PCs from a CCM database so you can foreach this function on the systems and enforce BDE.</p>
+<p>I have included a function in this module that will get unencrypted PCs from a CCM database so you can foreach the value on the systems and enforce BDE.</p>
 
-<pre><code>[string[]]$unEncryptedWorkStations=powershell ". .\Scripts\Get-UnEncryptedWorkstationsFromCCMDB.ps1; Get-UnEncryptedWorkstationsFromCCMDB -SqlServer SCCM_DB_Server -Database CM_ABC -IntergratedSecurity"
+<pre><code>[string[]]$unEncryptedWorkStations = Get-UnEncryptedWorkstationsFromCCMDB.ps1; Get-UnEncryptedWorkstationsFromCCMDB -SqlServer SCCM_DB_Server -Database CM_ABC -IntergratedSecurity
 
-foreach ($computer in $unEncryptedWorkStations)
+foreach ($workstation in $unEncryptedWorkStations)
 {
     # do things to enforce BitLocker....
 }
@@ -95,11 +92,25 @@ foreach ($computer in $unEncryptedWorkStations)
 <pre><code>####################################
 #Enforce-Bde.ps1
 #By Thomas Malkewitz @PowerShellSith
-#Enforce BitLocker Drive Encrytion on HP workstations using HPTPMAndBitLocker.psm1 and SCCM_DB_Server
+#Enforce BitLocker Drive Encryption on HP workstations using HPTPMAndBitLocker.psm1 and SCCM_DB_Server
 #USE AT YOUR OWN RISK
 ####################################
 
-# Helper Log Function
+# Globals
+
+$SqlServer = [String]::Empty
+$CCMDatabase = [String]::Empty
+
+if ([String]::IsNullOrEmpty($SqlServer) -or [String]::IsNullOrEmpty($CCMDatabase))
+{
+    throw "You must provide the CCM SqlServerName and Database to use this script"
+    exit
+}
+
+# End Globals
+
+# Functions
+
 &lt;#
 .SYNOPSIS
    Logs Events to a a logfile.
@@ -115,15 +126,15 @@ function Write-LogEntry
     Param
     (
         # Path, Type string, File path to the log.
-        [Parameter(Mandatory=$true,
-                   Position=0)]
+        [Parameter(Mandatory = $true,
+                   Position = 0)]
         [string]
         $Path,
 
         # Event, Type string, Event entry to append to the log.
-        [parameter(Mandatory=$true,
-                   ValueFromPipeLineByPropertyName=$true,
-                   Position=1)]
+        [parameter(Mandatory = $true,
+                   ValueFromPipeLineByPropertyName = $true,
+                   Position = 1)]
         [string[]]
         $Event
     )
@@ -131,10 +142,14 @@ function Write-LogEntry
     Add-Content $Path -Value ((Get-Date).ToLongDateString()+" "+(Get-Date).ToLongTimeString()+": "+$Event)
 }
 
+# End Functions
+
+# Main
+
 Import-Module HPTPMAndBitLocker
 $password = powershell ". .\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"
 $log = ".\Logs\"+(Get-Date -Format yyyyMMdd)+"_Enforce-BDE.ps1.log"
-[string[]]$unEncryptedWorkStations = powershell ". .\Scripts\Get-UnEncryptedWorkstationsFromCCMDB.ps1; Get-UnEncryptedWorkstationsFromCCMDB -SqlServer SQL_SERVER_HERE -Database CM_SITE_CODE -IntergratedSecurity"
+[string[]]$unEncryptedWorkStations = Get-UnEncryptedWorkstationsFromCCMDB -SqlServer $SqlServer -Database $CCMDatabase -IntergratedSecurity
 
 Write-LogEntry -Path $log -Event "####################################"
 Write-LogEntry -Path $log -Event "##### START OF ENFORCEMENT RUN #####"
@@ -154,7 +169,7 @@ foreach ($computer in $unEncryptedWorkStations)
         Write-LogEntry -Path $log -Event "Successfully contacted $computer."
 
         Write-LogEntry -Path $log -Event "Testing for TrueCrypt Disk Encryption on $computer..."
-        if (Test-Path "$env:ProgramData\TrueCrypt\Orginal System Loader")
+        if (Test-Path "$env:ProgramData\TrueCrypt\Original System Loader")
         {
             $SMSCli=[wmiclass]"\\$computer\root\ccm:SMS_Client"
             $SMSCli.TriggerSchedule("{00000000-0000-0000-0000-000000000002}") | Out-Null
@@ -193,7 +208,7 @@ foreach ($computer in $unEncryptedWorkStations)
                 Invoke-HPTPM -ComputerName $computer -Password $password | %{ Write-LogEntry -Path $log -Event $_ }
                 Write-LogEntry -Path $log -Event "Removing Setup password from $computer..."
                 Set-HPSetupPassword -ComputerName $computer -NewPassword " " -CurrentPassword $password | %{ Write-LogEntry -Path $log -Event $_ }
-                Write-LogEntry -Path $log -Event "System reboot required to complete tpm configuration.  BitLocker will be enforced on next run after reboot."
+                Write-LogEntry -Path $log -Event "System reboot required to complete TPM configuration.  BitLocker will be enforced on next run after reboot."
             }
             catch
             {
@@ -231,6 +246,8 @@ foreach ($computer in $unEncryptedWorkStations)
 Write-LogEntry -Path $log -Event "##################################"
 Write-LogEntry -Path $log -Event "##### END OF ENFORCEMENT RUN #####"
 Write-LogEntry -Path $log -Event "##################################"
+
+# End Main
 </code></pre>
       </section>
       <footer>

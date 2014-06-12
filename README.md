@@ -14,6 +14,7 @@ This Modules contains the following Functions:
 * Invoke-HPTPM
 * Get-BitLockerStatus
 * Invoke-BitLockerWithTPMAndNumricalKeyProtectors
+* Get-UnEncryptedWorkstationsFromCCMDB
 
 The first two functions are more for internal use of the module, the three HP tailored functions are *-HP* are tailored specifically for HP BIOS and TPM administration, essentially replacing the BiosConfigurationUtility usage TPM.  The remaining functions can be used on any workstation.
 
@@ -40,11 +41,11 @@ The first two functions are more for internal use of the module, the three HP ta
 		}
 	}
 	
-I have included a function script in the .\Scripts Directory that will get unencrypted PCs from a CCM database so you can foreach this function on the systems and enforce BDE.
+I have included a function in this module that will get unencrypted PCs from a CCM database so you can foreach the value on the systems and enforce BDE.
 
-	[string[]]$unEncryptedWorkStations=powershell ". .\Scripts\Get-UnEncryptedWorkstationsFromCCMDB.ps1; Get-UnEncryptedWorkstationsFromCCMDB -SqlServer SCCM_DB_Server -Database CM_ABC -IntergratedSecurity"
+	[string[]]$unEncryptedWorkStations = Get-UnEncryptedWorkstationsFromCCMDB.ps1; Get-UnEncryptedWorkstationsFromCCMDB -SqlServer SCCM_DB_Server -Database CM_ABC -IntergratedSecurity
 	
-	foreach ($computer in $unEncryptedWorkStations)
+	foreach ($workstation in $unEncryptedWorkStations)
 	{
 		# do things to enforce BitLocker....
 	}
@@ -56,11 +57,25 @@ I have added a second script in the .\Scripts Directory called Enforce-Bde.ps1 t
 	####################################
 	#Enforce-Bde.ps1
 	#By Thomas Malkewitz @PowerShellSith
-	#Enforce BitLocker Drive Encrytion on HP workstations using HPTPMAndBitLocker.psm1 and SCCM_DB_Server
+	#Enforce BitLocker Drive Encryption on HP workstations using HPTPMAndBitLocker.psm1 and SCCM_DB_Server
 	#USE AT YOUR OWN RISK
 	####################################
 	
-	# Helper Log Function
+	# Globals
+
+	$SqlServer = [String]::Empty
+	$CCMDatabase = [String]::Empty
+
+	if ([String]::IsNullOrEmpty($SqlServer) -or [String]::IsNullOrEmpty($CCMDatabase))
+	{
+		throw "You must provide the CCM SqlServerName and Database to use this script"
+		exit
+	}
+
+	# End Globals
+
+	# Functions
+
 	<#
 	.SYNOPSIS
 	   Logs Events to a a logfile.
@@ -76,15 +91,15 @@ I have added a second script in the .\Scripts Directory called Enforce-Bde.ps1 t
 		Param
 		(
 			# Path, Type string, File path to the log.
-			[Parameter(Mandatory=$true,
-					   Position=0)]
+			[Parameter(Mandatory = $true,
+					   Position = 0)]
 			[string]
 			$Path,
 
 			# Event, Type string, Event entry to append to the log.
-			[parameter(Mandatory=$true,
-					   ValueFromPipeLineByPropertyName=$true,
-					   Position=1)]
+			[parameter(Mandatory = $true,
+					   ValueFromPipeLineByPropertyName = $true,
+					   Position = 1)]
 			[string[]]
 			$Event
 		)
@@ -92,10 +107,14 @@ I have added a second script in the .\Scripts Directory called Enforce-Bde.ps1 t
 		Add-Content $Path -Value ((Get-Date).ToLongDateString()+" "+(Get-Date).ToLongTimeString()+": "+$Event)
 	}
 
+	# End Functions
+
+	# Main
+
 	Import-Module HPTPMAndBitLocker
 	$password = powershell ". .\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"
 	$log = ".\Logs\"+(Get-Date -Format yyyyMMdd)+"_Enforce-BDE.ps1.log"
-	[string[]]$unEncryptedWorkStations = powershell ". .\Scripts\Get-UnEncryptedWorkstationsFromCCMDB.ps1; Get-UnEncryptedWorkstationsFromCCMDB -SqlServer SQL_SERVER_HERE -Database CM_SITE_CODE -IntergratedSecurity"
+	[string[]]$unEncryptedWorkStations = Get-UnEncryptedWorkstationsFromCCMDB -SqlServer $SqlServer -Database $CCMDatabase -IntergratedSecurity
 
 	Write-LogEntry -Path $log -Event "####################################"
 	Write-LogEntry -Path $log -Event "##### START OF ENFORCEMENT RUN #####"
@@ -115,7 +134,7 @@ I have added a second script in the .\Scripts Directory called Enforce-Bde.ps1 t
 			Write-LogEntry -Path $log -Event "Successfully contacted $computer."
 			
 			Write-LogEntry -Path $log -Event "Testing for TrueCrypt Disk Encryption on $computer..."
-			if (Test-Path "$env:ProgramData\TrueCrypt\Orginal System Loader")
+			if (Test-Path "$env:ProgramData\TrueCrypt\Original System Loader")
 			{
 				$SMSCli=[wmiclass]"\\$computer\root\ccm:SMS_Client"
 				$SMSCli.TriggerSchedule("{00000000-0000-0000-0000-000000000002}") | Out-Null
@@ -154,7 +173,7 @@ I have added a second script in the .\Scripts Directory called Enforce-Bde.ps1 t
 					Invoke-HPTPM -ComputerName $computer -Password $password | %{ Write-LogEntry -Path $log -Event $_ }
 					Write-LogEntry -Path $log -Event "Removing Setup password from $computer..."
 					Set-HPSetupPassword -ComputerName $computer -NewPassword " " -CurrentPassword $password | %{ Write-LogEntry -Path $log -Event $_ }
-					Write-LogEntry -Path $log -Event "System reboot required to complete tpm configuration.  BitLocker will be enforced on next run after reboot."
+					Write-LogEntry -Path $log -Event "System reboot required to complete TPM configuration.  BitLocker will be enforced on next run after reboot."
 				}
 				catch
 				{
@@ -192,3 +211,5 @@ I have added a second script in the .\Scripts Directory called Enforce-Bde.ps1 t
 	Write-LogEntry -Path $log -Event "##################################"
 	Write-LogEntry -Path $log -Event "##### END OF ENFORCEMENT RUN #####"
 	Write-LogEntry -Path $log -Event "##################################"
+
+	# End Main

@@ -194,7 +194,7 @@ function Get-HPSetupPasswordIsSet
     (
         # ComputerName, Type string, System to evaluate Setup Password state against.
         [Parameter(ValueFromPipeline = $true)]
-        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } else { $true } })]
+        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
         [string[]]
         $ComputerName = $env:COMPUTERNAME
     )
@@ -250,7 +250,7 @@ function Set-HPSetupPassword
         # ComputerName, Type string, System to set Bios Setup Password.
         [Parameter(Position = 0,
                    ValueFromPipeline = $true)]
-        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } else { $true} })]
+        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true} })]
         [string[]]
         $ComputerName = $env:COMPUTERNAME,
 
@@ -330,7 +330,7 @@ function Get-TPMStatus
     (
         # ComputerName, Type string, System to evaluate TPM against.
         [Parameter(ValueFromPipeline = $true)]
-        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } else { $true } })]
+        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
         [string[]]
         $ComputerName = $env:COMPUTERNAME
     )
@@ -395,6 +395,7 @@ function Invoke-HPTPM
         [Parameter(ParameterSetName = "Standard",
                    Position = 0,
                    ValueFromPipeline = $true)]
+        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
         [string[]]
         $ComputerName = $env:ComputerName,
 
@@ -520,7 +521,7 @@ function Get-BitLockerStatus
         # ComputerName, Type string, System to evaluate BitLocker against.
         [Parameter(Position  =0,
                    ValueFromPipeline = $true)]
-        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $ComputerName.  Please ensure the system is available." } else { $true } })]
+        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
         [string[]]
         $ComputerName = $env:COMPUTERNAME,
 
@@ -612,6 +613,7 @@ function Invoke-BitLockerWithTPMAndNumricalKeyProtectors
         # ComputerName, Type string, System to invoke BitLocker against.
         [Parameter(Position = 0,
                    ValueFromPipeline = $true)]
+        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
         [string[]]
         $ComputerName = $env:COMPUTERNAME,
 
@@ -723,6 +725,7 @@ function Get-UnEncryptedWorkstationsFromCCMDB
         # SqlServer, Type string, The SQL Server containing the ConfigMgr database.
         [Parameter(Mandatory = $true,
                    Position = 0)]
+        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
         [string]
         $SqlServer = $env:COMPUTERNAME,
 

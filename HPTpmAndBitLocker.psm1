@@ -705,9 +705,9 @@ function Invoke-BitLockerWithTPMAndNumricalKeyProtectors
     Queries ConfigMgr Database for any workstation that has completed a Hardware Inventory Scan, looks for the BitLockerProtectionStatus Value, 1 is fully encrypted and Protection is on, 0 for anything else.
     Also uses the inventoried file: 'Orginal System Loader' which is used by TrueCrypt to indicate full disk encryption.
 .EXAMPLE
-    Get-UnEncryptedWorkstations
+    Get-UnEncryptedWorkstationsFromCMDB
 .EXAMPLE
-    Get-UnEncryptedWorkstations -SqlServer localhost -Database ConfigMgr -IntergratedSecurity
+    Get-UnEncryptedWorkstationsFromCMDB -SqlServer localhost -Database ConfigMgr -IntergratedSecurity
 .NOTES
     The BDE Status of a workstation is not inventoried with ConfigMgr by default, it needs to be enabled in the client settings..
     The file 'Orginal System Loader' is not inventoried with ConfigMgr by default, it needs to be configured in the client settings.
@@ -716,7 +716,7 @@ function Invoke-BitLockerWithTPMAndNumricalKeyProtectors
     https://github.com/PowerShellSith
     Twitter: @PowerShellSith
 #>
-function Get-UnEncryptedWorkstationsFromCCMDB
+function Get-UnEncryptedWorkstationsFromCMDB
 {
     [CmdletBinding()]
     [OutputType([array])]

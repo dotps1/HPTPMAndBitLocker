@@ -14,7 +14,7 @@ This Modules contains the following Functions:
 * Invoke-HPTPM
 * Get-BitLockerStatus
 * Invoke-BitLockerWithTPMAndNumricalKeyProtectors
-* Get-UnEncryptedWorkstationsFromCCMDB
+* Get-UnEncryptedWorkstationsFromCMDB
 
 The first two functions are more for internal use of the module, the three HP tailored functions are *-HP* are tailored specifically for HP BIOS and TPM administration, essentially replacing the BiosConfigurationUtility usage TPM.  The remaining functions can be used on any workstation.
 
@@ -43,7 +43,8 @@ The first two functions are more for internal use of the module, the three HP ta
 	
 I have included a function in this module that will get unencrypted PCs from a CCM database so you can foreach the value on the systems and enforce BDE.
 
-	[string[]]$unEncryptedWorkStations = Get-UnEncryptedWorkstationsFromCCMDB.ps1; Get-UnEncryptedWorkstationsFromCCMDB -SqlServer SCCM_DB_Server -Database CM_ABC -IntergratedSecurity
+	Import-Module HPTPMAndBitLocker
+	[string[]]$unEncryptedWorkStations = Get-UnEncryptedWorkstationsFromCMDB -SqlServer SCCM_DB_Server -Database CM_ABC -IntergratedSecurity
 	
 	foreach ($workstation in $unEncryptedWorkStations)
 	{
@@ -114,7 +115,7 @@ I have added a second script in the .\Scripts Directory called Enforce-Bde.ps1 t
 	Import-Module HPTPMAndBitLocker
 	$password = powershell ". .\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"
 	$log = ".\Logs\"+(Get-Date -Format yyyyMMdd)+"_Enforce-BDE.ps1.log"
-	[string[]]$unEncryptedWorkStations = Get-UnEncryptedWorkstationsFromCCMDB -SqlServer $SqlServer -Database $CCMDatabase -IntergratedSecurity
+	[string[]]$unEncryptedWorkStations = Get-UnEncryptedWorkstationsFromCMDB -SqlServer $SqlServer -Database $CCMDatabase -IntergratedSecurity
 
 	Write-LogEntry -Path $log -Event "####################################"
 	Write-LogEntry -Path $log -Event "##### START OF ENFORCEMENT RUN #####"

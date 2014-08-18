@@ -41,7 +41,7 @@ The first two functions are more for internal use of the module, the three HP ta
 		}
 	}
 	
-I have included a function in this module that will get unencrypted PCs from a CCM database so you can foreach the value on the systems and enforce BDE.
+I have included a function in this module that will get unencrypted PCs from a SCCM database so you can foreach the value on the systems and enforce BDE.
 
 	Import-Module HPTPMAndBitLocker
 	[string[]]$unEncryptedWorkStations = Get-UnEncryptedWorkstationsFromCMDB -SqlServer SCCM_DB_Server -Database CM_ABC -IntergratedSecurity
@@ -57,7 +57,7 @@ I have added a second script in the .\Scripts Directory called Enforce-Bde.ps1 t
 	
 	####################################
 	#Enforce-Bde.ps1
-	#By Thomas Malkewitz @PowerShellSith
+	#By Thomas Malkewitz @dotps1
 	#Enforce BitLocker Drive Encryption on HP workstations using HPTPMAndBitLocker.psm1 and SCCM_DB_Server
 	#USE AT YOUR OWN RISK
 	####################################
@@ -65,11 +65,11 @@ I have added a second script in the .\Scripts Directory called Enforce-Bde.ps1 t
 	# Globals
 
 	$SqlServer = [String]::Empty
-	$CCMDatabase = [String]::Empty
+	$SCCMDatabase = [String]::Empty
 
 	if ([String]::IsNullOrEmpty($SqlServer) -or [String]::IsNullOrEmpty($CCMDatabase))
 	{
-		throw "You must provide the CCM SqlServerName and Database to use this script"
+		throw "You must provide the SCCM SqlServerName and Database to use this script"
 		exit
 	}
 
@@ -115,7 +115,7 @@ I have added a second script in the .\Scripts Directory called Enforce-Bde.ps1 t
 	Import-Module HPTPMAndBitLocker
 	$password = powershell ". .\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"
 	$log = ".\Logs\"+(Get-Date -Format yyyyMMdd)+"_Enforce-BDE.ps1.log"
-	[string[]]$unEncryptedWorkStations = Get-UnEncryptedWorkstationsFromCMDB -SqlServer $SqlServer -Database $CCMDatabase -IntergratedSecurity
+	[string[]]$unEncryptedWorkStations = Get-UnEncryptedWorkstationsFromCMDB -SqlServer $SqlServer -Database $SCCMDatabase -IntergratedSecurity
 
 	Write-LogEntry -Path $log -Event "####################################"
 	Write-LogEntry -Path $log -Event "##### START OF ENFORCEMENT RUN #####"

@@ -9,20 +9,20 @@
     Out-HPVerboseReturnValues -WmiMethodReturnValue ((Get-WmiObject -Class HPBIOS_BIOSSettingInterface -Namespace "root\HP\InstrumentedBIOS").SetBIOSSetting("Setup Password"," ","MyPassword"))
 .LINK
     http://h20331.www2.hp.com/HPsub/downloads/cmi_whitepaper.pdf  Page: 14
-    https://github.com/PowerShellSith
-    Twitter: @PowerShellSith
+    http://dotps1.github.io
+    Twitter: @dotps1
 #>
 function Out-HPVerboseReturnValues
 {
     [CmdletBinding()]
-    [OutputType([string])]
+    [OutputType([String])]
     param
     (
-        # WmiMethodReturnValue, Type int, The Return Property Value to be converted to verbose output.
+        # WmiMethodReturnValue, Type Int, The Return Property Value to be converted to verbose output.
         [Parameter(Mandatory = $true,
                    ValueFromPipeline = $true)]
         [Alias("RetVal")]
-        [int]
+        [Int]
         $WmiMethodReturnValue
     )
 
@@ -50,21 +50,21 @@ function Out-HPVerboseReturnValues
     http://www.codeproject.com/Articles/7305/Keyboard-Events-Simulation-using-keybd_event-funct
     http://msdn.microsoft.com/en-us/library/aa299374%28v = vs.60%29.aspx
     http://h20331.www2.hp.com/HPsub/downloads/cmi_whitepaper.pdf  Page: 14
-    https://github.com/PowerShellSith
-    Twitter: @PowerShellSith
+    http://dotps1.github.io
+    Twitter: @dotps1
 #>
 function ConvertTo-KBDString
 {
     [CmdletBinding()]
-    [OutputType([string])]
+    [OutputType([String])]
     param
     (
-        # Input, Type string, String to be encoded with EN Keyboard Scan Code Hex Values.
+        # Input, Type String, String to be encoded with EN Keyboard Scan Code Hex Values.
         [Parameter(Mandatory = $true,
                    ValueFromPipeline = $true)]
         [Alias("UniStr")]
         [AllowEmptyString()]
-        [string]
+        [String]
         $UnicodeString
     )
 
@@ -183,19 +183,19 @@ function ConvertTo-KBDString
 .EXAMPLE
     Get-HPSetupPasswordIsSet -ComputerName "mycomputer.mydomain.org"
 .LINK
-    https://github.com/PowerShellSith
-    Twitter: @PowerShellSith
+    http://dotps1.github.io
+    Twitter: @dotps1
 #>
 function Get-HPSetupPasswordIsSet
 {
     [CmdletBinding()]
-    [OutputType([bool])]
+    [OutputType([Bool])]
     param
     (
-        # ComputerName, Type string, System to evaluate Setup Password state against.
+        # ComputerName, Type String, System to evaluate Setup Password state against.
         [Parameter(ValueFromPipeline = $true)]
-        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
-        [string[]]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
+        [String[]]
         $ComputerName = $env:COMPUTERNAME
     )
 
@@ -238,31 +238,31 @@ function Get-HPSetupPasswordIsSet
 .EXAMPLE
     Set-HPSetupPassword -NewSetupPassword "MyNewSetupPassword" -CurrentSetupPassword "MyCurrentPassword"
 .LINK
-    https://github.com/PowerShellSith
-    Twitter: @PowerShellSith
+    http://dotps1.github.io
+    Twitter: @dotps1
 #>
 function Set-HPSetupPassword
 {
     [CmdletBinding()]
-    [OutputType([void])]
+    [OutputType([Void])]
     param
     (
-        # ComputerName, Type string, System to set Bios Setup Password.
+        # ComputerName, Type String, System to set Bios Setup Password.
         [Parameter(Position = 0,
                    ValueFromPipeline = $true)]
-        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true} })]
-        [string[]]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true} })]
+        [String[]]
         $ComputerName = $env:COMPUTERNAME,
 
-        # NewPassword, Type string, The value of the password to be set.  The password can be cleared by using a space surrounded by double quotes, IE: " ".
+        # NewPassword, Type String, The value of the password to be set.  The password can be cleared by using a space surrounded by double quotes, IE: " ".
         [Parameter(Mandatory = $true,
                    Position = 1)]
-        [string]
+        [String]
         $NewPassword,
 
-        # CurrentPassword, Type string, The value of the current setup password.
+        # CurrentPassword, Type String, The value of the current setup password.
         [Parameter(Position = 2)]
-        [string]
+        [String]
         $CurrentPassword
     )
 
@@ -319,19 +319,19 @@ function Set-HPSetupPassword
    Get-TPMStatus -ComputerName "mycomputer.mydomain.org"
 .LINK
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376484%28v = vs.85%29.aspx
-    https://github.com/PowerShellSith
-    Twitter: @PowerShellSith
+    http://dotps1.github.io
+    Twitter: @dotps1
 #>
 function Get-TPMStatus 
 {
     [CmdletBinding()]
-    [OutputType([PSobject])]
+    [OutputType([PSObject])]
     param 
     (
-        # ComputerName, Type string, System to evaluate TPM against.
+        # ComputerName, Type String, System to evaluate TPM against.
         [Parameter(ValueFromPipeline = $true)]
-        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
-        [string[]]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
+        [String[]]
         $ComputerName = $env:COMPUTERNAME
     )
 
@@ -382,41 +382,41 @@ function Get-TPMStatus
 .EXAMPLE
     Invoke-HPTPM -SetupPassword "ABCD1234" -RestartComputer -RestartDelay 30
 .LINK
-    https://github.com/PowerShellSith
-    Twitter: @PowerShellSith
+    http://dotps1.github.io
+    Twitter: @dotps1
 #>
 function Invoke-HPTPM
 {
     [CmdletBinding()]
-    [OutputType([void])]
+    [OutputType([Void])]
     param
     (
-        # ComputerName, Type string, The HP Computer to enable and configure TPM.
+        # ComputerName, Type String, The HP Computer to enable and configure TPM.
         [Parameter(ParameterSetName = "Standard",
                    Position = 0,
                    ValueFromPipeline = $true)]
-        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
-        [string[]]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
+        [String[]]
         $ComputerName = $env:ComputerName,
 
-        # Password, Type string, The current Setup Password of the system Bios.
+        # Password, Type String, The current Setup Password of the system Bios.
         [Parameter(ParameterSetName = "Standard",
                    Mandatory = $true,
                    Position = 1)]
-        [string]
+        [String]
         $Password,
 
-        # RestartComputer, Type switch, Boolean value that determines to reboot the pc.
+        # RestartComputer, Type Switch, Boolean value that determines to reboot the pc.
         [Parameter(ParameterSetName = "Overload",
                    Mandatory = $false)]
-        [switch]
+        [Switch]
         $RestartComputer,
 
-        # RestartDelay, Type int, The amount of time in seconds before the computer restarts, must be specified if the $RestartComputer switch is used.
+        # RestartDelay, Type Int, The amount of time in seconds before the computer restarts, must be specified if the $RestartComputer switch is used.
         [Parameter(ParameterSetName = "Overload",
                    Mandatory = $true)]
         [ValidateRange(0,86400)]
-        [int]
+        [Int]
         $RestartDelay
     )
 
@@ -509,8 +509,8 @@ function Invoke-HPTPM
     The drive letter must be followed with a double colon.  IE: "C:".
 .LINK
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376483%28v = vs.85%29.aspx
-    https://github.com/PowerShellSith
-    Twitter: @PowerShellSith
+    http://dotps1.github.io
+    Twitter: @dotps1
 #>
 function Get-BitLockerStatus 
 {    
@@ -518,18 +518,18 @@ function Get-BitLockerStatus
     [OutputType([PSObject])]
     param
     (
-        # ComputerName, Type string, System to evaluate BitLocker against.
-        [Parameter(Position  =0,
+        # ComputerName, Type String, System to evaluate BitLocker against.
+        [Parameter(Position = 0,
                    ValueFromPipeline = $true)]
-        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
-        [string[]]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
+        [String[]]
         $ComputerName = $env:COMPUTERNAME,
 
-        # DriveLetter, Type string, Drive letter to evaluate BitLocker against.  if NullOrEmpty the default SystemDrive will be used.
+        # DriveLetter, Type String, Drive letter to evaluate BitLocker against.  if NullOrEmpty the default SystemDrive will be used.
         [Parameter(Position = 1,
                    HelpMessage = "Drive letter format must be letter followed by colon, 'C:'")]
         [ValidatePattern('[a-zA-Z]:')]
-        [string]
+        [String]
         $DriveLetter
     )
 
@@ -601,31 +601,31 @@ function Get-BitLockerStatus
 .LINK
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa376483%28v = vs.85%29.aspx
     http://technet.microsoft.com/en-us/library/dd875529%28v = ws.10%29.aspx
-    https://github.com/PowerShellSith
-    Twitter: @PowerShellSith
+    http://dotps1.github.io
+    Twitter: @dotps1
 #>
 function Invoke-BitLockerWithTPMAndNumricalKeyProtectors 
 {    
     [CmdletBinding()]
-    [OutputType([void])] 
+    [OutputType([Void])] 
     param
     (
-        # ComputerName, Type string, System to invoke BitLocker against.
+        # ComputerName, Type String, System to invoke BitLocker against.
         [Parameter(Position = 0,
                    ValueFromPipeline = $true)]
-        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
-        [string[]]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
+        [String[]]
         $ComputerName = $env:COMPUTERNAME,
 
-        # DriveLetter, Type string, Drive letter to invoke BitLocker against.  if NullOrEmpty the SystemDrive will be used.
+        # DriveLetter, Type String, Drive letter to invoke BitLocker against.  if NullOrEmpty the SystemDrive will be used.
         [Parameter(Position = 1)]
         [ValidatePattern('[a-zA-Z]:')]
-        [string]
+        [String]
         $DriveLetter,
 
-        # ADKeyBackup, Type switch, Backups recovery information to the AD DS Object.
+        # ADKeyBackup, Type Switch, Backups recovery information to the AD DS Object.
         [Parameter(position = 2)]
-        [switch]
+        [Switch]
         $ADKeyBackup = $false
     )
 
@@ -713,37 +713,37 @@ function Invoke-BitLockerWithTPMAndNumricalKeyProtectors
     The file 'Orginal System Loader' is not inventoried with ConfigMgr by default, it needs to be configured in the client settings.
     The file location is %ProgramData%\TrueCrypt\Original System Loader.
 .LINK
-    https://github.com/PowerShellSith
-    Twitter: @PowerShellSith
+    http://dotps1.github.io
+    Twitter: @dotps1
 #>
 function Get-UnEncryptedWorkstationsFromCMDB
 {
     [CmdletBinding()]
-    [OutputType([array])]
+    [OutputType([Array])]
     param
     (
-        # SqlServer, Type string, The SQL Server containing the ConfigMgr database.
+        # SqlServer, Type String, The SQL Server containing the ConfigMgr database.
         [Parameter(Mandatory = $true,
                    Position = 0)]
-        [ValidateScript({ if (-not (Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
-        [string]
+        [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
+        [String]
         $SqlServer = $env:COMPUTERNAME,
 
-        # ConnectionPort, Type int, Port to connect to SQL server with, defualt value is 1433.
+        # ConnectionPort, Type Int, Port to connect to SQL server with, defualt value is 1433.
         [parameter(Position = 1)]
         [ValidateRange(1,50009)]
         [Alias("Port")]
-        [int]
+        [Int]
         $ConnectionPort = 1433,
 
-        # Database, Type string, The name of the ConfigMgr database.
+        # Database, Type String, The name of the ConfigMgr database.
         [Parameter(Mandatory = $true,
                    Position = 2)]
-        [string]
+        [String]
         $Database,
 
-        # IntergratedSecurity, Type switch, Use the currently logged on users credentials.
-        [switch]
+        # IntergratedSecurity, Type Switch, Use the currently logged on users credentials.
+        [Switch]
         $IntergratedSecurity
     )
 
@@ -755,7 +755,7 @@ function Get-UnEncryptedWorkstationsFromCMDB
     }
     else
     {
-        $sqlCredentials=Get-Credential
+        $sqlCredentials = Get-Credential
         $sqlConnection.ConnectionString += "false;User ID=$($sqlCredentials.Username);Password=$($sqlCredentials.GetNetworkCredential().Password);"
     }
     
@@ -768,7 +768,7 @@ function Get-UnEncryptedWorkstationsFromCMDB
         throw $Error[0].Exception.Message
     }
 
-    $sqlCMD=New-Object System.Data.SqlClient.SqlCommand
+    $sqlCMD = New-Object System.Data.SqlClient.SqlCommand
     $sqlCMD.CommandText = "with ct_CollectedFiles (FileName,ClientID) as
                           (select   dbo.CollectedFiles.FileName,
 		                            dbo.CollectedFiles.ClientID

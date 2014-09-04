@@ -51,205 +51,205 @@ Also, the BiosConfigurationUtility from HP is even more cumbersome to manage TPM
 <li>Get-UnEncryptedWorkstationsFromCMDB</li>
 </ul><p>The first two functions are more for internal use of the module, the three HP tailored functions are <em>-HP</em> are tailored specifically for HP BIOS and TPM administration, essentially replacing the BiosConfigurationUtility usage TPM.  The remaining functions can be used on any workstation.</p>
 
-<pre><code># Configure TPM on HP Models:
-Import-Module .\HPTpmAndBitLocker.psm1
-# Current Setup Password, if there is not a current password, one will randomly be generated, and removed after configuration completes.
-# A Setup Password is required for pragmatically modifying the BIOS.
-$password = ""
+<div class="highlight highlight-PowerShell"><pre><span class="c"># Configure TPM on HP Models:</span>
+<span class="nb">Import-Module</span> <span class="p">.\</span><span class="n">HPTpmAndBitLocker</span><span class="p">.</span><span class="n">psm1</span>
+<span class="c"># Current Setup Password, if there is not a current password, one will randomly be generated, and removed after configuration completes.</span>
+<span class="c"># A Setup Password is required for pragmatically modifying the BIOS.</span>
+<span class="nv">$password</span> <span class="p">=</span> <span class="s2">""</span>
 
-if (-not(Get-TPMStatus).Enabled -eq "Yes" -or (-not(Get-TPMStatus).Activated -eq "Yes"))
-{
-    if(-not(Get-HPSetupPasswordIsSet))
-    {
-        $password = powershell ". .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"
-        $randomPasswordUsed = $true
-        Set-HPSetupPassword -NewPassword $password
-    }
+<span class="k">if</span> <span class="p">(</span><span class="o">-not</span><span class="p">(</span><span class="nb">Get-TPMStatus</span><span class="p">).</span><span class="n">Enabled</span> <span class="o">-eq</span> <span class="s2">"Yes"</span> <span class="o">-or</span> <span class="p">(</span><span class="o">-not</span><span class="p">(</span><span class="nb">Get-TPMStatus</span><span class="p">).</span><span class="n">Activated</span> <span class="o">-eq</span> <span class="s2">"Yes"</span><span class="p">))</span>
+<span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="o">-not</span><span class="p">(</span><span class="nb">Get-HPSetupPasswordIsSet</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="nv">$password</span> <span class="p">=</span> <span class="n">powershell</span> <span class="s2">". .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"</span>
+        <span class="nv">$randomPasswordUsed</span> <span class="p">=</span> <span class="nv">$true</span>
+        <span class="nb">Set-HPSetupPassword</span> <span class="n">-NewPassword</span> <span class="nv">$password</span>
+    <span class="p">}</span>
 
-    Invoke-HPTPM -Password $password
+    <span class="nb">Invoke-HPTPM</span> <span class="n">-Password</span> <span class="nv">$password</span>
 
-    if ($randomPasswordUsed)
-    {
-        Set-HPSetupPassword -NewPassword " " -CurrentPassword $password
-    }
-}
-</code></pre>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$randomPasswordUsed</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nb">Set-HPSetupPassword</span> <span class="n">-NewPassword</span> <span class="s2">" "</span> <span class="n">-CurrentPassword</span> <span class="nv">$password</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
 
 <p>I have included a function in this module that will get unencrypted PCs from a SCCM database so you can foreach the value on the systems and enforce BDE.</p>
 
-<pre><code>Import-Module HPTPMAndBitLocker
-[string[]]$unEncryptedWorkStations = Get-UnEncryptedWorkstationsFromCMDB -SqlServer SCCM_DB_Server -Database CM_ABC -IntergratedSecurity
+<div class="highlight highlight-PowerShell"><pre><span class="nb">Import-Module</span> <span class="n">HPTPMAndBitLocker</span>
+<span class="no">[string[]]</span><span class="nv">$unEncryptedWorkStations</span> <span class="p">=</span> <span class="nb">Get-UnEncryptedWorkstationsFromCMDB</span> <span class="n">-SqlServer</span> <span class="n">SCCM_DB_Server</span> <span class="n">-Database</span> <span class="n">CM_ABC</span> <span class="n">-IntergratedSecurity</span>
 
-foreach ($workstation in $unEncryptedWorkStations)
-{
-    # do things to enforce BitLocker....
-}
-</code></pre>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$workstation</span> <span class="k">in</span> <span class="nv">$unEncryptedWorkStations</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c"># do things to enforce BitLocker....</span>
+<span class="p">}</span>
+</pre></div>
 
 <p><strong>UPDATE</strong></p>
 
 <p>I have added a second script in the .\Scripts Directory called Enforce-Bde.ps1 that has a full enforcement and logging, just sent the params for your Logs Directory and for your ConfigMgr SQL Server.  You need to enable BitLockerDrive status in your ConfigMgr Client Settings to use this Script.</p>
 
-<pre><code>####################################
-#Enforce-Bde.ps1
-#By Thomas Malkewitz @dotps1
-#Enforce BitLocker Drive Encryption on HP workstations using HPTPMAndBitLocker.psm1 and SCCM_DB_Server
-#USE AT YOUR OWN RISK
-####################################
+<div class="highlight highlight-PowerShell"><pre><span class="c">####################################</span>
+<span class="c">#Enforce-Bde.ps1</span>
+<span class="c">#By Thomas Malkewitz @dotps1</span>
+<span class="c">#Enforce BitLocker Drive Encryption on HP workstations using HPTPMAndBitLocker.psm1 and SCCM_DB_Server</span>
+<span class="c">#USE AT YOUR OWN RISK</span>
+<span class="c">####################################</span>
 
-# Globals
+<span class="c"># Globals</span>
 
-$SqlServer = [String]::Empty
-$SCCMDatabase = [String]::Empty
+<span class="nv">$SqlServer</span> <span class="p">=</span> <span class="no">[String]</span><span class="p">::</span><span class="n">Empty</span>
+<span class="nv">$SCCMDatabase</span> <span class="p">=</span> <span class="no">[String]</span><span class="p">::</span><span class="n">Empty</span>
 
-if ([String]::IsNullOrEmpty($SqlServer) -or [String]::IsNullOrEmpty($CCMDatabase))
-{
-    throw "You must provide the SCCM SqlServerName and Database to use this script"
-    exit
-}
+<span class="k">if</span> <span class="p">(</span><span class="no">[String]</span><span class="p">::</span><span class="n">IsNullOrEmpty</span><span class="p">(</span><span class="nv">$SqlServer</span><span class="p">)</span> <span class="o">-or</span> <span class="no">[String]</span><span class="p">::</span><span class="n">IsNullOrEmpty</span><span class="p">(</span><span class="nv">$CCMDatabase</span><span class="p">))</span>
+<span class="p">{</span>
+    <span class="k">throw</span> <span class="s2">"You must provide the SCCM SqlServerName and Database to use this script"</span>
+    <span class="n">exit</span>
+<span class="p">}</span>
 
-# End Globals
+<span class="c"># End Globals</span>
 
-# Functions
+<span class="c"># Functions</span>
 
-&lt;#
-.SYNOPSIS
-   Logs Events to a a logfile.
-.DESCRIPTION
-   Logs all errors foreach operation to a file.
-.EXAMPLE
-   Write-LogEntry -Path C:\My.log -Event "MyEvent: Event"
-#&gt;
-function Write-LogEntry
-{
-    [CmdletBinding()]
-    [OutputType([void])]
-    Param
-    (
-        # Path, Type string, File path to the log.
-        [Parameter(Mandatory = $true,
-                   Position = 0)]
-        [string]
-        $Path,
+<span class="cm">&lt;#</span>
+<span class="sd">.SYNOPSIS</span><span class="cm"></span>
+<span class="cm">   Logs Events to a a logfile.</span>
+<span class="sd">.DESCRIPTION</span><span class="cm"></span>
+<span class="cm">   Logs all errors foreach operation to a file.</span>
+<span class="sd">.EXAMPLE</span><span class="cm"></span>
+<span class="cm">   Write-LogEntry -Path C:\My.log -Event "MyEvent: Event"</span>
+<span class="cm">#&gt;</span>
+<span class="k">function</span> <span class="nb">Write-LogEntry</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="k">CmdletBinding</span><span class="p">()]</span>
+    <span class="p">[</span><span class="n">OutputType</span><span class="p">(</span><span class="no">[void]</span><span class="p">)]</span>
+    <span class="k">Param</span>
+    <span class="p">(</span>
+        <span class="c"># Path, Type string, File path to the log.</span>
+        <span class="p">[</span><span class="k">Parameter</span><span class="p">(</span><span class="k">Mandatory</span> <span class="p">=</span> <span class="nv">$true</span><span class="p">,</span>
+                   <span class="k">Position</span> <span class="p">=</span> <span class="n">0</span><span class="p">)]</span>
+        <span class="no">[string]</span>
+        <span class="nv">$Path</span><span class="p">,</span>
 
-        # Event, Type string, Event entry to append to the log.
-        [parameter(Mandatory = $true,
-                   ValueFromPipeLineByPropertyName = $true,
-                   Position = 1)]
-        [string[]]
-        $Event
-    )
+        <span class="c"># Event, Type string, Event entry to append to the log.</span>
+        <span class="p">[</span><span class="k">parameter</span><span class="p">(</span><span class="k">Mandatory</span> <span class="p">=</span> <span class="nv">$true</span><span class="p">,</span>
+                   <span class="k">ValueFromPipeLineByPropertyName</span> <span class="p">=</span> <span class="nv">$true</span><span class="p">,</span>
+                   <span class="k">Position</span> <span class="p">=</span> <span class="n">1</span><span class="p">)]</span>
+        <span class="no">[string[]]</span>
+        <span class="nv">$Event</span>
+    <span class="p">)</span>
 
-    Add-Content $Path -Value ((Get-Date).ToLongDateString()+" "+(Get-Date).ToLongTimeString()+": "+$Event)
-}
+    <span class="nb">Add-Content</span> <span class="nv">$Path</span> <span class="n">-Value</span> <span class="p">((</span><span class="nb">Get-Date</span><span class="p">).</span><span class="n">ToLongDateString</span><span class="p">()+</span><span class="s2">" "</span><span class="p">+(</span><span class="nb">Get-Date</span><span class="p">).</span><span class="n">ToLongTimeString</span><span class="p">()+</span><span class="s2">": "</span><span class="p">+</span><span class="nv">$Event</span><span class="p">)</span>
+<span class="p">}</span>
 
-# End Functions
+<span class="c"># End Functions</span>
 
-# Main
+<span class="c"># Main</span>
 
-Import-Module HPTPMAndBitLocker
-$password = powershell ". .\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"
-$log = ".\Logs\"+(Get-Date -Format yyyyMMdd)+"_Enforce-BDE.ps1.log"
-[string[]]$unEncryptedWorkStations = Get-UnEncryptedWorkstationsFromCMDB -SqlServer $SqlServer -Database $SCCMDatabase -IntergratedSecurity
+<span class="nb">Import-Module</span> <span class="n">HPTPMAndBitLocker</span>
+<span class="nv">$password</span> <span class="p">=</span> <span class="n">powershell</span> <span class="s2">". .\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"</span>
+<span class="nv">$log</span> <span class="p">=</span> <span class="s2">".\Logs\"</span><span class="p">+(</span><span class="nb">Get-Date</span> <span class="n">-Format</span> <span class="n">yyyyMMdd</span><span class="p">)+</span><span class="s2">"_Enforce-BDE.ps1.log"</span>
+<span class="no">[string[]]</span><span class="nv">$unEncryptedWorkStations</span> <span class="p">=</span> <span class="nb">Get-UnEncryptedWorkstationsFromCMDB</span> <span class="n">-SqlServer</span> <span class="nv">$SqlServer</span> <span class="n">-Database</span> <span class="nv">$SCCMDatabase</span> <span class="n">-IntergratedSecurity</span>
 
-Write-LogEntry -Path $log -Event "####################################"
-Write-LogEntry -Path $log -Event "##### START OF ENFORCEMENT RUN #####"
-Write-LogEntry -Path $log -Event "####################################"
-Write-LogEntry -Path $log -Event ("Total Number of Unencrypted Workstations: " + $unEncryptedWorkStations.Length)
+<span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"####################################"</span>
+<span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"##### START OF ENFORCEMENT RUN #####"</span>
+<span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"####################################"</span>
+<span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="p">(</span><span class="s2">"Total Number of Unencrypted Workstations: "</span> <span class="p">+</span> <span class="nv">$unEncryptedWorkStations</span><span class="p">.</span><span class="n">Length</span><span class="p">)</span>
 
-foreach ($computer in $unEncryptedWorkStations)
-{
-    Write-LogEntry -Path $log -Event "Attempting to ping $computer..."
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$computer</span> <span class="k">in</span> <span class="nv">$unEncryptedWorkStations</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"Attempting to ping $computer..."</span>
 
-    if (-not(Test-Connection $computer -Count 1 -ErrorAction SilentlyContinue))
-    {
-        Write-LogEntry -Path $log -Event $error[0].ToString()
-    }
-    else
-    {
-        Write-LogEntry -Path $log -Event "Successfully contacted $computer."
+    <span class="k">if</span> <span class="p">(</span><span class="o">-not</span><span class="p">(</span><span class="nb">Test-Connection</span> <span class="nv">$computer</span> <span class="n">-Count</span> <span class="n">1</span> <span class="n">-ErrorAction</span> <span class="n">SilentlyContinue</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="nv">$error</span><span class="p">[</span><span class="n">0</span><span class="p">].</span><span class="n">ToString</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"Successfully contacted $computer."</span>
 
-        Write-LogEntry -Path $log -Event "Testing for TrueCrypt Disk Encryption on $computer..."
-        if (Test-Path "$env:ProgramData\TrueCrypt\Original System Loader")
-        {
-            $SMSCli=[wmiclass]"\\$computer\root\ccm:SMS_Client"
-            $SMSCli.TriggerSchedule("{00000000-0000-0000-0000-000000000002}") | Out-Null
-            Write-LogEntry -Path $log -Event "Computer is fully encrypted with TrueCrypt Full Disk Encryption, triggering ccm software inventory cycle for $computer..."
-            break
-        }
-        else
-        {
-            Write-LogEntry -Path $log -Event "TrueCrypt Disk Encryption not detected on $computer..."
-        }
-        Write-LogEntry -Path $log -Event "Retrieving tpm status for $computer..."
-        try
-        {
-            Write-LogEntry -Path $log -Event ("TPM enabled: "+(Get-TPMStatus -ComputerName $computer).Enabled) 
-            Write-LogEntry -Path $log -Event ("TPM activated: "+(Get-TPMStatus -ComputerName $computer).Activated) 
-        }
-        catch
-        {
-            Write-LogEntry -Path $log -Event $error[0].ToString()
-            Continue
-        }
+        <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"Testing for TrueCrypt Disk Encryption on $computer..."</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">Test-Path</span> <span class="s2">"$env:ProgramData\TrueCrypt\Original System Loader"</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="nv">$SMSCli</span><span class="p">=</span><span class="no">[wmiclass]</span><span class="s2">"\\$computer\root\ccm:SMS_Client"</span>
+            <span class="nv">$SMSCli</span><span class="p">.</span><span class="n">TriggerSchedule</span><span class="p">(</span><span class="s2">"{00000000-0000-0000-0000-000000000002}"</span><span class="p">)</span> <span class="p">|</span> <span class="nb">Out-Null</span>
+            <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"Computer is fully encrypted with TrueCrypt Full Disk Encryption, triggering ccm software inventory cycle for $computer..."</span>
+            <span class="k">break</span>
+        <span class="p">}</span>
+        <span class="k">else</span>
+        <span class="p">{</span>
+            <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"TrueCrypt Disk Encryption not detected on $computer..."</span>
+        <span class="p">}</span>
+        <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"Retrieving tpm status for $computer..."</span>
+        <span class="k">try</span>
+        <span class="p">{</span>
+            <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="p">(</span><span class="s2">"TPM enabled: "</span><span class="p">+(</span><span class="nb">Get-TPMStatus</span> <span class="n">-ComputerName</span> <span class="nv">$computer</span><span class="p">).</span><span class="n">Enabled</span><span class="p">)</span> 
+            <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="p">(</span><span class="s2">"TPM activated: "</span><span class="p">+(</span><span class="nb">Get-TPMStatus</span> <span class="n">-ComputerName</span> <span class="nv">$computer</span><span class="p">).</span><span class="n">Activated</span><span class="p">)</span> 
+        <span class="p">}</span>
+        <span class="k">catch</span>
+        <span class="p">{</span>
+            <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="nv">$error</span><span class="p">[</span><span class="n">0</span><span class="p">].</span><span class="n">ToString</span><span class="p">()</span>
+            <span class="k">Continue</span>
+        <span class="p">}</span>
 
-        if ((Get-TPMStatus -ComputerName $computer).Enabled -ne "Yes" -or (Get-TPMStatus -ComputerName $computer).Activated -ne "Yes")
-        {
-            Write-LogEntry -Path $log -Event "TPM is not properly configured on $computer."
-            Write-LogEntry -Path $log -Event "Retrieving setup password state on $computer..."
-            try
-            {
-                if (-not(Get-HPSetupPasswordIsSet -ComputerName $computer))
-                {
-                    Write-LogEntry -Path $log -Event "Setup password is set: False"
-                    Write-LogEntry -Path $log -Event ("Generating password: "+($password=powershell ". .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"))
-                    Set-HPSetupPassword -ComputerName $computer -NewPassword $password | %{ Write-LogEntry -Path $log -Event $_ }
-                }
-                Write-LogEntry -Path $log -Event "Setup password is set: True"
-                Invoke-HPTPM -ComputerName $computer -Password $password | %{ Write-LogEntry -Path $log -Event $_ }
-                Write-LogEntry -Path $log -Event "Removing Setup password from $computer..."
-                Set-HPSetupPassword -ComputerName $computer -NewPassword " " -CurrentPassword $password | %{ Write-LogEntry -Path $log -Event $_ }
-                Write-LogEntry -Path $log -Event "System reboot required to complete TPM configuration.  BitLocker will be enforced on next run after reboot."
-            }
-            catch
-            {
-                Write-LogEntry -Path $log -Event $error[0].ToString()
-                Continue
-            }
-        }
-        else
-        {
-            Write-LogEntry -Path $log -Event "TPM is properly configured on $computer."
-            Write-LogEntry -Path $log -Event "Retrieving BitLocker status on $computer..."
-            Write-LogEntry -Path $log -Event ("Protection: "+(Get-BitLockerStatus -ComputerName $computer).Protection)
-            Write-LogEntry -Path $log -Event ("State: "+(Get-BitLockerStatus -ComputerName $computer).State)
-            Write-LogEntry -Path $log -Event ("Percentage: "+(Get-BitLockerStatus -ComputerName $computer).Percentage)
-            if ((Get-BitLockerStatus -ComputerName $computer).Protection -eq "ProtectionOn")
-            {
-                $SMSCli=[wmiclass]"\\$computer\root\ccm:SMS_Client"
-                $SMSCli.TriggerSchedule("{00000000-0000-0000-0000-000000000001}") | Out-Null
-                Write-LogEntry -Path $log -Event "Computer is fully encrypted and protection is on, triggering ccm hardware inventory cycle for $computer..."
-            }
-            elseif ((Get-BitLockerStatus -ComputerName $computer).State -ne "EncryptionInProgress")
-            {
-                Write-LogEntry -Path $log -Event "Invoking BitLocker drive encryption on $computer."
+        <span class="k">if</span> <span class="p">((</span><span class="nb">Get-TPMStatus</span> <span class="n">-ComputerName</span> <span class="nv">$computer</span><span class="p">).</span><span class="n">Enabled</span> <span class="o">-ne</span> <span class="s2">"Yes"</span> <span class="o">-or</span> <span class="p">(</span><span class="nb">Get-TPMStatus</span> <span class="n">-ComputerName</span> <span class="nv">$computer</span><span class="p">).</span><span class="n">Activated</span> <span class="o">-ne</span> <span class="s2">"Yes"</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"TPM is not properly configured on $computer."</span>
+            <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"Retrieving setup password state on $computer..."</span>
+            <span class="k">try</span>
+            <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="o">-not</span><span class="p">(</span><span class="nb">Get-HPSetupPasswordIsSet</span> <span class="n">-ComputerName</span> <span class="nv">$computer</span><span class="p">))</span>
+                <span class="p">{</span>
+                    <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"Setup password is set: False"</span>
+                    <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="p">(</span><span class="s2">"Generating password: "</span><span class="p">+(</span><span class="nv">$password</span><span class="p">=</span><span class="n">powershell</span> <span class="s2">". .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"</span><span class="p">))</span>
+                    <span class="nb">Set-HPSetupPassword</span> <span class="n">-ComputerName</span> <span class="nv">$computer</span> <span class="n">-NewPassword</span> <span class="nv">$password</span> <span class="p">|</span> <span class="p">%{</span> <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="nv">$_</span> <span class="p">}</span>
+                <span class="p">}</span>
+                <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"Setup password is set: True"</span>
+                <span class="nb">Invoke-HPTPM</span> <span class="n">-ComputerName</span> <span class="nv">$computer</span> <span class="n">-Password</span> <span class="nv">$password</span> <span class="p">|</span> <span class="p">%{</span> <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="nv">$_</span> <span class="p">}</span>
+                <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"Removing Setup password from $computer..."</span>
+                <span class="nb">Set-HPSetupPassword</span> <span class="n">-ComputerName</span> <span class="nv">$computer</span> <span class="n">-NewPassword</span> <span class="s2">" "</span> <span class="n">-CurrentPassword</span> <span class="nv">$password</span> <span class="p">|</span> <span class="p">%{</span> <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="nv">$_</span> <span class="p">}</span>
+                <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"System reboot required to complete TPM configuration.  BitLocker will be enforced on next run after reboot."</span>
+            <span class="p">}</span>
+            <span class="k">catch</span>
+            <span class="p">{</span>
+                <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="nv">$error</span><span class="p">[</span><span class="n">0</span><span class="p">].</span><span class="n">ToString</span><span class="p">()</span>
+                <span class="k">Continue</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">else</span>
+        <span class="p">{</span>
+            <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"TPM is properly configured on $computer."</span>
+            <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"Retrieving BitLocker status on $computer..."</span>
+            <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="p">(</span><span class="s2">"Protection: "</span><span class="p">+(</span><span class="nb">Get-BitLockerStatus</span> <span class="n">-ComputerName</span> <span class="nv">$computer</span><span class="p">).</span><span class="n">Protection</span><span class="p">)</span>
+            <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="p">(</span><span class="s2">"State: "</span><span class="p">+(</span><span class="nb">Get-BitLockerStatus</span> <span class="n">-ComputerName</span> <span class="nv">$computer</span><span class="p">).</span><span class="n">State</span><span class="p">)</span>
+            <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="p">(</span><span class="s2">"Percentage: "</span><span class="p">+(</span><span class="nb">Get-BitLockerStatus</span> <span class="n">-ComputerName</span> <span class="nv">$computer</span><span class="p">).</span><span class="n">Percentage</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">((</span><span class="nb">Get-BitLockerStatus</span> <span class="n">-ComputerName</span> <span class="nv">$computer</span><span class="p">).</span><span class="n">Protection</span> <span class="o">-eq</span> <span class="s2">"ProtectionOn"</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="nv">$SMSCli</span><span class="p">=</span><span class="no">[wmiclass]</span><span class="s2">"\\$computer\root\ccm:SMS_Client"</span>
+                <span class="nv">$SMSCli</span><span class="p">.</span><span class="n">TriggerSchedule</span><span class="p">(</span><span class="s2">"{00000000-0000-0000-0000-000000000001}"</span><span class="p">)</span> <span class="p">|</span> <span class="nb">Out-Null</span>
+                <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"Computer is fully encrypted and protection is on, triggering ccm hardware inventory cycle for $computer..."</span>
+            <span class="p">}</span>
+            <span class="k">elseif</span> <span class="p">((</span><span class="nb">Get-BitLockerStatus</span> <span class="n">-ComputerName</span> <span class="nv">$computer</span><span class="p">).</span><span class="n">State</span> <span class="o">-ne</span> <span class="s2">"EncryptionInProgress"</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"Invoking BitLocker drive encryption on $computer."</span>
 
-                Invoke-BitLockerWithTPMAndNumricalKeyProtectors -ComputerName $computer -ADKeyBackup | Out-Null
+                <span class="nb">Invoke-BitLockerWithTPMAndNumricalKeyProtectors</span> <span class="n">-ComputerName</span> <span class="nv">$computer</span> <span class="n">-ADKeyBackup</span> <span class="p">|</span> <span class="nb">Out-Null</span>
 
-                Write-LogEntry -Path $log -Event ("Protection: "+(Get-BitLockerStatus -ComputerName $computer).Protection)
-                Write-LogEntry -Path $log -Event ("State: "+(Get-BitLockerStatus -ComputerName $computer).State)
-                Write-LogEntry -Path $log -Event ("Percentage: "+(Get-BitLockerStatus -ComputerName $computer).Percentage)
-            }
-        }
-    }
-}
+                <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="p">(</span><span class="s2">"Protection: "</span><span class="p">+(</span><span class="nb">Get-BitLockerStatus</span> <span class="n">-ComputerName</span> <span class="nv">$computer</span><span class="p">).</span><span class="n">Protection</span><span class="p">)</span>
+                <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="p">(</span><span class="s2">"State: "</span><span class="p">+(</span><span class="nb">Get-BitLockerStatus</span> <span class="n">-ComputerName</span> <span class="nv">$computer</span><span class="p">).</span><span class="n">State</span><span class="p">)</span>
+                <span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="p">(</span><span class="s2">"Percentage: "</span><span class="p">+(</span><span class="nb">Get-BitLockerStatus</span> <span class="n">-ComputerName</span> <span class="nv">$computer</span><span class="p">).</span><span class="n">Percentage</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 
-Write-LogEntry -Path $log -Event "##################################"
-Write-LogEntry -Path $log -Event "##### END OF ENFORCEMENT RUN #####"
-Write-LogEntry -Path $log -Event "##################################"
+<span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"##################################"</span>
+<span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"##### END OF ENFORCEMENT RUN #####"</span>
+<span class="nb">Write-LogEntry</span> <span class="n">-Path</span> <span class="nv">$log</span> <span class="n">-Event</span> <span class="s2">"##################################"</span>
 
-# End Main
-</code></pre>
+<span class="c"># End Main</span>
+</pre></div>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/dotps1">dotps1</a></p>

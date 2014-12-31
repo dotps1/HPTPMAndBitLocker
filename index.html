@@ -41,7 +41,7 @@ Also, the BiosConfigurationUtility from HP is even more cumbersome to manage TPM
 
 <ul>
 <li>Get-HPBiosSetupPasswordIsSet</li>
-<li>Set-HPBiosSetupPassword</li>
+<li>Test-HPBiosSetupPassword</li>
 <li>Test-HPTPMEnabledAndActivated </li>
 <li>Invoke-HPTPM</li>
 <li>Get-BitLockerStatus</li>
@@ -59,7 +59,7 @@ Also, the BiosConfigurationUtility from HP is even more cumbersome to manage TPM
 
 <span class="pl-k">if</span> (<span class="pl-k">-not</span> (<span class="pl-k"><span class="pl-k">Test-HPTPMEnabledAndActivated</span></span>))
 {
-    <span class="pl-k">if</span>(<span class="pl-k">-not</span>(<span class="pl-k"><span class="pl-k">Get-HPBiosSetupPasswordIsSet</span></span>))
+    <span class="pl-k">if</span>(<span class="pl-k">-not</span>(<span class="pl-k"><span class="pl-k">Test-HPBiosSetupPasswordIsSet</span></span>))
     {
         <span class="pl-vo">$password</span> <span class="pl-k">=</span> powershell <span class="pl-s1"><span class="pl-pds">"</span>. .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers<span class="pl-pds">"</span></span>
         <span class="pl-vo">$randomPasswordUsed</span> <span class="pl-k">=</span> <span class="pl-vo">$true</span>
@@ -123,13 +123,13 @@ Function <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span>
     (
 <span class="pl-c">        # Path, Type string, File path to the log.</span>
         [Parameter(<span class="pl-vpf">Mandatory</span> <span class="pl-k">=</span> <span class="pl-vo">$true</span>)]
-        [string]
+        [String]
         <span class="pl-vo">$Path</span>,
 
 <span class="pl-c">        # Event, Type string, Event entry to append to the log.</span>
         [parameter(<span class="pl-vpf">Mandatory</span> <span class="pl-k">=</span> <span class="pl-vo">$true</span>,
                     <span class="pl-vpf">ValueFromPipeLineByPropertyName</span> <span class="pl-k">=</span> <span class="pl-vo">$true</span>)]
-        [string[]]
+        [String[]]
         <span class="pl-vo">$Event</span>
     )
 
@@ -141,7 +141,7 @@ Function <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span>
 <span class="pl-c"># Main</span>
 
 <span class="pl-k"><span class="pl-k">Import-Module</span></span> HPTPMAndBitLocker
-<span class="pl-vo">$password</span> <span class="pl-k">=</span> powershell <span class="pl-s1"><span class="pl-pds">"</span>. .\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers<span class="pl-pds">"</span></span>
+<span class="pl-vo">$password</span> <span class="pl-k">=</span> PowerShell <span class="pl-s1"><span class="pl-pds">"</span>. .\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers<span class="pl-pds">"</span></span>
 <span class="pl-vo">$log</span> <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">"</span>.\Logs\$(Get-Date -Format yyyyMMdd)_Enforce-BDE.ps1.log<span class="pl-pds">"</span></span>
 [String[]]<span class="pl-vo">$unEncryptedWorkStations</span> <span class="pl-k">=</span> (<span class="pl-k"><span class="pl-k">Get-UnEncryptedWorkstationsFromCCMDB</span></span> <span class="pl-k">-</span>SqlServer <span class="pl-vo">$SqlServer</span> <span class="pl-k">-</span>Database <span class="pl-vo">$CCMDatabase</span> <span class="pl-k">-</span>IntergratedSecurity).ComputerName
 
@@ -154,9 +154,9 @@ foreach (<span class="pl-vo">$computer</span> <span class="pl-k">in</span> <span
 {
     <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>Attempting to ping $computer...<span class="pl-pds">"</span></span>
 
-    <span class="pl-k">if</span> (<span class="pl-k">-not</span>(<span class="pl-k"><span class="pl-k">Test-Connection</span></span> <span class="pl-vo">$computer</span> <span class="pl-k">-</span>Count <span class="pl-c1">1</span> <span class="pl-k">-</span>ErrorAction SilentlyContinue))
+    <span class="pl-k">if</span> (<span class="pl-k">-not</span> (<span class="pl-k"><span class="pl-k">Test-Connection</span></span> <span class="pl-vo">$computer</span> <span class="pl-k">-</span>Count <span class="pl-c1">1</span> <span class="pl-k">-</span>ErrorAction SilentlyContinue))
     {
-        <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-vo">$error</span>[<span class="pl-c1">0</span>].ToString()
+        <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-vo">$Error</span>[<span class="pl-c1">0</span>].ToString()
     }
     <span class="pl-k">else</span>
     {
@@ -177,7 +177,7 @@ foreach (<span class="pl-vo">$computer</span> <span class="pl-k">in</span> <span
         <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>Retrieving TPM status for $computer...<span class="pl-pds">"</span></span>
         <span class="pl-k">try</span>
         {
-            <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event (<span class="pl-s1"><span class="pl-pds">"</span>TPM Propoerly Configured: $(Test-HPTPMEnabledAndActivated -ComputerName $computer)<span class="pl-pds">"</span></span>) 
+            <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event (<span class="pl-s1"><span class="pl-pds">"</span>TPM Properly Configured: $(Test-HPTPMEnabledAndActivated -ComputerName $computer)<span class="pl-pds">"</span></span>) 
         }
         catch
         {
@@ -191,7 +191,7 @@ foreach (<span class="pl-vo">$computer</span> <span class="pl-k">in</span> <span
             <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>Retrieving setup password state on $computer...<span class="pl-pds">"</span></span>
             <span class="pl-k">try</span>
             {
-                <span class="pl-k">if</span> (<span class="pl-k">-not</span>(<span class="pl-k"><span class="pl-k">Get-HPBiosSetupPasswordIsSet</span></span> <span class="pl-k">-</span>ComputerName <span class="pl-vo">$computer</span>))
+                <span class="pl-k">if</span> (<span class="pl-k">-not</span>(<span class="pl-k"><span class="pl-k">Test-HPBiosSetupPasswordIsSet</span></span> <span class="pl-k">-</span>ComputerName <span class="pl-vo">$computer</span>))
                 {
                     <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>Setup password is set: False<span class="pl-pds">"</span></span>
                     <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event (<span class="pl-s1"><span class="pl-pds">"</span>Generating password: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> (<span class="pl-vo">$password</span> <span class="pl-k">=</span> powershell <span class="pl-s1"><span class="pl-pds">"</span>. .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers<span class="pl-pds">"</span></span>))

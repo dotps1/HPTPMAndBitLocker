@@ -7,7 +7,7 @@ Also, the BiosConfigurationUtility from HP is even more cumbersome to manage TPM
 
 This Modules contains the following Functions:
 * Get-HPBiosSetupPasswordIsSet
-* Set-HPBiosSetupPassword
+* Test-HPBiosSetupPassword
 * Test-HPTPMEnabledAndActivated 
 * Invoke-HPTPM
 * Get-BitLockerStatus
@@ -24,7 +24,7 @@ $password = ""
 
 if (-not (Test-HPTPMEnabledAndActivated))
 {
-	if(-not(Get-HPBiosSetupPasswordIsSet))
+	if(-not(Test-HPBiosSetupPasswordIsSet))
 	{
 		$password = powershell ". .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"
 		$randomPasswordUsed = $true
@@ -90,13 +90,13 @@ Function Write-LogEntry
 	(
 		# Path, Type string, File path to the log.
 		[Parameter(Mandatory = $true)]
-		[string]
+		[String]
 		$Path,
 
 		# Event, Type string, Event entry to append to the log.
 		[parameter(Mandatory = $true,
 					ValueFromPipeLineByPropertyName = $true)]
-		[string[]]
+		[String[]]
 		$Event
 	)
 
@@ -108,7 +108,7 @@ Function Write-LogEntry
 # Main
 
 Import-Module HPTPMAndBitLocker
-$password = powershell ". .\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"
+$password = PowerShell ". .\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"
 $log = ".\Logs\$(Get-Date -Format yyyyMMdd)_Enforce-BDE.ps1.log"
 [String[]]$unEncryptedWorkStations = (Get-UnEncryptedWorkstationsFromCCMDB -SqlServer $SqlServer -Database $CCMDatabase -IntergratedSecurity).ComputerName
 
@@ -121,9 +121,9 @@ foreach ($computer in $unEncryptedWorkStations)
 {
 	Write-LogEntry -Path $log -Event "Attempting to ping $computer..."
 
-	if (-not(Test-Connection $computer -Count 1 -ErrorAction SilentlyContinue))
+	if (-not (Test-Connection $computer -Count 1 -ErrorAction SilentlyContinue))
 	{
-		Write-LogEntry -Path $log -Event $error[0].ToString()
+		Write-LogEntry -Path $log -Event $Error[0].ToString()
 	}
 	else
 	{
@@ -144,7 +144,7 @@ foreach ($computer in $unEncryptedWorkStations)
 		Write-LogEntry -Path $log -Event "Retrieving TPM status for $computer..."
 		try
 		{
-            Write-LogEntry -Path $log -Event ("TPM Propoerly Configured: $(Test-HPTPMEnabledAndActivated -ComputerName $computer)") 
+            Write-LogEntry -Path $log -Event ("TPM Properly Configured: $(Test-HPTPMEnabledAndActivated -ComputerName $computer)") 
 		}
 		catch
 		{
@@ -158,7 +158,7 @@ foreach ($computer in $unEncryptedWorkStations)
 			Write-LogEntry -Path $log -Event "Retrieving setup password state on $computer..."
 			try
 			{
-				if (-not(Get-HPBiosSetupPasswordIsSet -ComputerName $computer))
+				if (-not(Test-HPBiosSetupPasswordIsSet -ComputerName $computer))
 				{
 					Write-LogEntry -Path $log -Event "Setup password is set: False"
 					Write-LogEntry -Path $log -Event ("Generating password: " + ($password = powershell ". .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"))

@@ -200,7 +200,7 @@ Function ConvertTo-KBDString
 .LINK
     http://dotps1.github.io
 #>
-Function Get-HPBiosSetupPasswordIsSet
+Function Test-HPBiosSetupPasswordIsSet
 {
     [CmdletBinding()]
     [OutputType([Bool])]
@@ -438,7 +438,7 @@ Function Invoke-HPTPM
 		throw "The TPM is already properly configured."
 	}
 
-    if (-not (Get-HPSetupPasswordIsSet -ComputerName $ComputerName))
+    if (-not (Test-HPBiosSetupPasswordIsSet -ComputerName $ComputerName))
     {
         throw "The Bios Setup Password must be set before this cmdlet can be used."
     }

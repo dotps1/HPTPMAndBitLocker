@@ -33,13 +33,13 @@ Function Write-LogEntry
 	(
 		# Path, Type string, File path to the log.
 		[Parameter(Mandatory = $true)]
-		[string]
+		[String]
 		$Path,
 
 		# Event, Type string, Event entry to append to the log.
 		[parameter(Mandatory = $true,
 					ValueFromPipeLineByPropertyName = $true)]
-		[string[]]
+		[String[]]
 		$Event
 	)
 
@@ -87,7 +87,7 @@ foreach ($computer in $unEncryptedWorkStations)
 		Write-LogEntry -Path $log -Event "Retrieving TPM status for $computer..."
 		try
 		{
-            Write-LogEntry -Path $log -Event ("TPM Propoerly Configured: $(Test-HPTPMEnabledAndActivated -ComputerName $computer)") 
+            Write-LogEntry -Path $log -Event ("TPM properly configured: $(Test-HPTPMEnabledAndActivated -ComputerName $computer)") 
 		}
 		catch
 		{
@@ -101,7 +101,7 @@ foreach ($computer in $unEncryptedWorkStations)
 			Write-LogEntry -Path $log -Event "Retrieving setup password state on $computer..."
 			try
 			{
-				if (-not(Get-HPBiosSetupPasswordIsSet -ComputerName $computer))
+				if (-not (Test-HPBiosSetupPasswordIsSet -ComputerName $computer))
 				{
 					Write-LogEntry -Path $log -Event "Setup password is set: False"
 					Write-LogEntry -Path $log -Event ("Generating password: " + ($password = powershell ". .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"))

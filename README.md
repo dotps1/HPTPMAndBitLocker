@@ -6,13 +6,13 @@ I have found the "MangeBde.exe" CLI tool a little cumbersome, so I am developing
 Also, the BiosConfigurationUtility from HP is even more cumbersome to manage TPM, with the verbiage being slightly different between models, I need model specific configuration files for every pc I manage to activate and enable TPM.
 
 This Modules contains the following Functions:
-*Get-BitLockerStatus
-*Get-UnEncryptedWorkstationsFromCMDB
-*Invoke-BitLockerWithTPMAndNumricalKeyProtectors
-*Invoke-HPTPM
-*Set-HPBiosSetupPassword
-*Test-HPBiosSetupPasswordIsSet
-*Test-HPTPMEnabledAndActivated
+* Get-BitLockerStatus
+* Get-UnEncryptedWorkstationsFromCMDB
+* Invoke-BitLockerWithTPMAndNumricalKeyProtectors
+* Invoke-HPTPM
+* Set-HPBiosSetupPassword
+* Test-HPBiosSetupPasswordIsSet
+* Test-HPTPMEnabledAndActivated
 
 
 The three HP tailored functions are *-HP* are tailored specifically for HP BIOS and TPM administration, essentially replacing the BiosConfigurationUtility usage for TPM.  The remaining functions can be used on any workstations.

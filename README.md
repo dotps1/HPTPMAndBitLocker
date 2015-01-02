@@ -2,19 +2,19 @@
 
 **Highly customized BitLocker PowerShell Module for TPM Administration and BitLocker Administration for HP Workstations.**
 
-I have found the "MangeBde.exe" CLI tool a little cumbersome, so I am developing a "More Powerful" BitLocker  PowerShell Module.
+I have found the "MangeBde.exe" CLI tool a little cumbersome, so I am developing a "More Powerful" BitLocker PowerShell Module.
 Also, the BiosConfigurationUtility from HP is even more cumbersome to manage TPM, with the verbiage being slightly different between models, I need model specific configuration files for every pc I manage to activate and enable TPM.
 
 This Modules contains the following Functions:
-* Get-HPBiosSetupPasswordIsSet
-* Test-HPBiosSetupPassword
-* Test-HPTPMEnabledAndActivated 
-* Invoke-HPTPM
-* Get-BitLockerStatus
-* Invoke-BitLockerWithTPMAndNumricalKeyProtectors
-* Get-UnEncryptedWorkstationsFromCMDB
+*Get-BitLockerStatus                                                                                                           
+*Get-UnEncryptedWorkstationsFromCMDB                                                                                              
+*Invoke-BitLockerWithTPMAndNumricalKeyProtectors                                                                                      
+*Invoke-HPTPM                                                                                                                        
+*Set-HPBiosSetupPassword
+*Test-HPBiosSetupPasswordIsSet                                                                                                         
+*Test-HPTPMEnabledAndActivated
 
-The first two functions are more for internal use of the module, the three HP tailored functions are *-HP* are tailored specifically for HP BIOS and TPM administration, essentially replacing the BiosConfigurationUtility usage TPM.  The remaining functions can be used on any workstation.
+The three HP tailored functions are *-HP* are tailored specifically for HP BIOS and TPM administration, essentially replacing the BiosConfigurationUtility usage for TPM.  The remaining functions can be used on any workstations.
 ```PowerShell
 # Configure TPM on HP Models:
 Import-Module .\HPTpmAndBitLocker.psm1
@@ -94,8 +94,8 @@ Function Write-LogEntry
 		$Path,
 
 		# Event, Type string, Event entry to append to the log.
-		[parameter(Mandatory = $true,
-					ValueFromPipeLineByPropertyName = $true)]
+		[Parameter(Mandatory = $true,
+				ValueFromPipeLineByPropertyName = $true)]
 		[String[]]
 		$Event
 	)

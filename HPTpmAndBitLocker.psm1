@@ -1,6 +1,4 @@
-﻿# Begin Module.
-
-<#
+﻿<#
 .SYNOPSIS
     Converts the return values to user friendly text.
 .DESCRIPTION
@@ -866,5 +864,3 @@ Function Get-UnEncryptedWorkstationsFromCMDB
     $results.Close()
     $sqlConnection.Close()
 }
-
-# End Module.

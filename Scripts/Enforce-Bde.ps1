@@ -37,8 +37,8 @@ Function Write-LogEntry
 		$Path,
 
 		# Event, Type string, Event entry to append to the log.
-		[parameter(Mandatory = $true,
-					ValueFromPipeLineByPropertyName = $true)]
+		[Parameter(Mandatory = $true,
+				   ValueFromPipeLineByPropertyName = $true)]
 		[String[]]
 		$Event
 	)

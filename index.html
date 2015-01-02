@@ -1,55 +1,58 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>HPTPMAndBitLocker by dotps1</title>
+    <meta name="description" content="HPTPMAndBitLocker : Custom Powershell Module to ease TPM and BitLocker Administration for HP Workstations">
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>HPTPMAndBitLocker</title>
   </head>
+
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>HPTPMAndBitLocker</h1>
-        <p>Custom Powershell Module to ease TPM and BitLocker Administration for HP Workstations</p>
 
-        <p class="view"><a href="https://github.com/dotps1/HPTPMAndBitLocker">View the Project on GitHub <small>dotps1/HPTPMAndBitLocker</small></a></p>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/dotps1/HPTPMAndBitLocker">View on GitHub</a>
 
+          <h1 id="project_title">HPTPMAndBitLocker</h1>
+          <h2 id="project_tagline">Custom Powershell Module to ease TPM and BitLocker Administration for HP Workstations</h2>
 
-        <ul>
-          <li><a href="https://github.com/dotps1/HPTPMAndBitLocker/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/dotps1/HPTPMAndBitLocker/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/dotps1/HPTPMAndBitLocker">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/dotps1/HPTPMAndBitLocker/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/dotps1/HPTPMAndBitLocker/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
         <h3>
 <a id="this-module-has-the-ability-to-modify-bios-settings-use-at-your-own-risk" class="anchor" href="#this-module-has-the-ability-to-modify-bios-settings-use-at-your-own-risk" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>THIS MODULE HAS THE ABILITY TO MODIFY BIOS SETTINGS USE AT YOUR OWN RISK</em>
 </h3>
 
 <p><strong>Highly customized BitLocker PowerShell Module for TPM Administration and BitLocker Administration for HP Workstations.</strong></p>
 
-<p>I have found the "MangeBde.exe" CLI tool a little cumbersome, so I am developing a "More Powerful" BitLocker  PowerShell Module.
+<p>I have found the "MangeBde.exe" CLI tool a little cumbersome, so I am developing a "More Powerful" BitLocker PowerShell Module.
 Also, the BiosConfigurationUtility from HP is even more cumbersome to manage TPM, with the verbiage being slightly different between models, I need model specific configuration files for every pc I manage to activate and enable TPM.</p>
 
 <p>This Modules contains the following Functions:</p>
 
 <ul>
-<li>Get-HPBiosSetupPasswordIsSet</li>
-<li>Test-HPBiosSetupPassword</li>
-<li>Test-HPTPMEnabledAndActivated </li>
-<li>Invoke-HPTPM</li>
 <li>Get-BitLockerStatus</li>
-<li>Invoke-BitLockerWithTPMAndNumricalKeyProtectors</li>
 <li>Get-UnEncryptedWorkstationsFromCMDB</li>
+<li>Invoke-BitLockerWithTPMAndNumricalKeyProtectors</li>
+<li>Invoke-HPTPM</li>
+<li>Set-HPBiosSetupPassword</li>
+<li>Test-HPBiosSetupPasswordIsSet</li>
+<li>Test-HPTPMEnabledAndActivated</li>
 </ul>
 
-<p>The first two functions are more for internal use of the module, the three HP tailored functions are <em>-HP</em> are tailored specifically for HP BIOS and TPM administration, essentially replacing the BiosConfigurationUtility usage TPM.  The remaining functions can be used on any workstation.</p>
+<p>The three HP tailored functions are <em>-HP</em> are tailored specifically for HP BIOS and TPM administration, essentially replacing the BiosConfigurationUtility usage for TPM.  The remaining functions can be used on any workstations.</p>
 
 <div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Configure TPM on HP Models:</span>
 <span class="pl-k"><span class="pl-k">Import-Module</span></span> .\HPTpmAndBitLocker.psm1
@@ -127,8 +130,8 @@ Function <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span>
         <span class="pl-vo">$Path</span>,
 
 <span class="pl-c">        # Event, Type string, Event entry to append to the log.</span>
-        [parameter(<span class="pl-vpf">Mandatory</span> <span class="pl-k">=</span> <span class="pl-vo">$true</span>,
-                    <span class="pl-vpf">ValueFromPipeLineByPropertyName</span> <span class="pl-k">=</span> <span class="pl-vo">$true</span>)]
+        [Parameter(<span class="pl-vpf">Mandatory</span> <span class="pl-k">=</span> <span class="pl-vo">$true</span>,
+                <span class="pl-vpf">ValueFromPipeLineByPropertyName</span> <span class="pl-k">=</span> <span class="pl-vo">$true</span>)]
         [String[]]
         <span class="pl-vo">$Event</span>
     )
@@ -242,12 +245,17 @@ foreach (<span class="pl-vo">$computer</span> <span class="pl-k">in</span> <span
 
 <span class="pl-c"># End Main</span></pre></div>
       </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/dotps1">dotps1</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">HPTPMAndBitLocker maintained by <a href="https://github.com/dotps1">dotps1</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
-    <script src="javascripts/scale.fix.js"></script>
+
     
+
   </body>
 </html>

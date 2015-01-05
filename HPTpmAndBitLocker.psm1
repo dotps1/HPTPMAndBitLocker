@@ -3,10 +3,12 @@
     Converts the return values to user friendly text.
 .DESCRIPTION
     Converts the return values from the .SetBIOSSetting() WMI Method to user firendly verbose output.
-.INPUT
+.INPUTS
 	System.Int.
-.OUTPUT
+.OUTPUTS
 	System.String.
+.PARAMETER WmiMethodReturnValue
+    The Return Property Value to be converted to verbose output.
 .EXAMPLE
     Out-HPVerboseReturnValues -WmiMethodReturnValue 0
 .EXAMPLE
@@ -22,7 +24,6 @@ Function Get-HPVerboseReturnValues
     [OutputType([String])]
     Param
     (
-        # WmiMethodReturnValue, Type Int, The Return Property Value to be converted to verbose output.
         [Parameter(Mandatory = $true,
                    ValueFromPipeline = $true)]
         [Alias("RetVal")]
@@ -48,10 +49,12 @@ Function Get-HPVerboseReturnValues
     Converts string to KBD encoded string.
 .DESCRIPTION
     Converts UTF16 string to Keyboard Scan Hex Value (KBD).  Older HP BIOS's only accept this encoding method for setup passwords, useful for WMI BIOS Administration.
-.INPUT
+.INPUTS
 	System.String.
-.OUTPUT
+.OUTPUTS
 	System.String.
+.PARAMETER UnicodeString
+    String to be encoded with EN Keyboard Scan Code Hex Values.
 .EXAMPLE
     ConvertTo-KBDString -UnicodeString "MyStringToConvert"
 .LINK
@@ -69,7 +72,6 @@ Function ConvertTo-KBDString
     [OutputType([String])]
     Param
     (
-        # Input, Type String, String to be encoded with EN Keyboard Scan Code Hex Values.
         [Parameter(Mandatory = $true,
                    ValueFromPipeline = $true)]
         [Alias("UniStr")]
@@ -187,10 +189,12 @@ Function ConvertTo-KBDString
     Gets the current state of the setup password.  It is not possiable to return the current setup password value.
 .DESCRIPTION
     This function will determine if the password is set on the system, automation of BIOS Settings cannot be used until the password is set.
-.INPUT
+.INPUTS
 	System.String.
-.OUTPUT
+.OUTPUTS
 	System.Boolean.
+.PARAMETER ComputerName
+    System to evaluate Setup Password state against.
 .EXAMPLE
     Get-HPSetupPasswordIsSet
 .EXAMPLE
@@ -204,7 +208,6 @@ Function Test-HPBiosSetupPasswordIsSet
     [OutputType([Bool])]
     Param
     (
-        # ComputerName, Type String, System to evaluate Setup Password state against.
         [Parameter(ValueFromPipeline = $true)]
         [ValidateScript({ if (Test-Connection -ComputerName $_ -Quiet -Count 2){ $true }})]
         [String[]]
@@ -250,10 +253,16 @@ Function Test-HPBiosSetupPasswordIsSet
 .DESCRIPTION
     This function can be used to set a password on the Bios, it can also be used to clear the password, the current password is needed to change the value.
     If a new value is being set, and not cleared, it must be between 8 and 30 characters.
-.INPUT
+.INPUTS
 	System.String
-.OUTPUT
+.OUTPUTS
 	None.
+.PARAMETER ComputerName
+    System to set Bios Setup Password.
+.PARAMETER NewPassword
+    The value of the password to be set.  The password can be cleared by using a space surrounded by double quotes, IE: " ".
+.PARAMETER CurrentPassword
+    The value of the current setup bios password.
 .EXAMPLE
     Set-HPSetupPassword -NewSetupPassword "MyNewPassword"
 .EXAMPLE
@@ -269,20 +278,17 @@ Function Set-HPBiosSetupPassword
     [OutputType([Void])]
     Param
     (
-        # ComputerName, Type String, System to set Bios Setup Password.
         [Parameter(ValueFromPipeline = $true)]
         [ValidateScript({ if (Test-Connection -ComputerName $_ -Quiet -Count 2){ $true }})]
         [String[]]
         $ComputerName = $env:COMPUTERNAME,
 
-        # NewPassword, Type String, The value of the password to be set.  The password can be cleared by using a space surrounded by double quotes, IE: " ".
         [Parameter(Mandatory = $true)]
 		[ValidateNotNull()]
 		[ValidateScript({ if (($_.Length -ge 8 -and $_.Length -le 30) -or ($_ -eq " ")){ $true }})]
         [String]
         $NewPassword,
 
-        # CurrentPassword, Type String, The value of the current setup password.
         [Parameter()]
 		[ValidateNotNull()]
 		[ValidateScript({ if ($_.Length -ge 8 -and $_.Length -le 30){ $true }})]
@@ -338,10 +344,12 @@ Function Set-HPBiosSetupPassword
    Get the current status of the TPM.
 .DESCRIPTION
    Tests the status of the Trusted Platform Module, only returns true if both enabled and activated.
-.INPUT
+.INPUTS
 	System.String.
-.OUTPUT
+.OUTPUTS
 	System.Boolean.
+.PARAMETER ComputerName
+    System to evaluate TPM against.
 .EXAMPLE
    Get-TPMStatus
 .EXAMPLE
@@ -357,7 +365,6 @@ Function Test-HPTPMEnabledAndActivated
     [OutputType([Bool])]
     Param 
     (
-        # ComputerName, Type String, System to evaluate TPM against.
         [Parameter(ValueFromPipeline = $true)]
         [ValidateScript({ if (Test-Connection -ComputerName $_ -Quiet -Count 2){ $true }})]
         [String[]]
@@ -389,10 +396,18 @@ Function Test-HPTPMEnabledAndActivated
 .DESCRIPTION
     Enables and configures the required settings of the TPM in order to use the TPM Protector Type for BitLocker drive encryption.
     A system restart is required to complete this action, the default delay of this timer is 30 seconds if the restart switch is used.
-.INPUT
+.INPUTS
 	System.String
-.OUTPUT
+.OUTPUTS
 	None.
+.PARAMETER ComputerName
+    The HP Computer to enable and configure TPM.
+.PARAMETER BiosSetupPassword
+    The current Setup Password of the system Bios.
+.PARAMETER RestartComputer
+    Inovokes a restart of the computer upon completion of TPM Configuration.
+.PARAMETER RestartDelay
+    The amount of time in seconds before the computer restarts.
 .EXAMPLE
     Invoke-HPTPM -SetupPassword "MyPassword"
 .EXAMPLE
@@ -408,23 +423,19 @@ Function Invoke-HPTPM
     [OutputType([Void])]
     Param
     (
-        # ComputerName, Type String, The HP Computer to enable and configure TPM.
         [Parameter(ValueFromPipeline = $true)]
         [ValidateScript({ if (Test-Connection -ComputerName $_ -Quiet -Count 2){ $true }})]
         [String[]]
         $ComputerName = $env:ComputerName,
 
-        # BiosSetupPassword, Type String, The current Setup Password of the system Bios.
         [Parameter(Mandatory = $true)]
         [String]
         $BiosSetupPassword,
 
-        # RestartComputer, Type Switch, Boolean value that determines to reboot the pc.
         [Parameter()]
         [Switch]
         $RestartComputer,
 
-        # RestartDelay, Type Int, The amount of time in seconds before the computer restarts, must be specified if the $RestartComputer switch is used.
         [Parameter()]
         [ValidateRange(0,86400)]
         [Int]
@@ -540,10 +551,14 @@ Function Invoke-HPTPM
     Gets the current status of BitLocker.
 .DESCRIPTION
     Tests the current status of BitLocker Drive Encryption on an Encryptable Volume.  Only returns true if the volume is fully encrypted and the protection status is on.
-.INPUT
+.INPUTS
 	System.String.
-.OUTPUT
+.OUTPUTS
 	System.Management.Automation.PSObject
+.PARAMETER ComputerName
+    System to evaluate BitLocker against.
+.PARAMETER DriveLetter
+    Drive letter to evaluate BitLocker against.  if NullOrEmpty the default SystemDrive will be used.
 .EXAMPLE
     Get-BitLockerStatus
 .EXAMPLE
@@ -562,13 +577,11 @@ Function Get-BitLockerStatus
     [OutputType([PSObject])]
     Param
     (
-        # ComputerName, Type String, System to evaluate BitLocker against.
         [Parameter(ValueFromPipeline = $true)]
         [ValidateScript({ if (Test-Connection -ComputerName $_ -Quiet -Count 2){ $true }})]
         [String[]]
         $ComputerName = $env:COMPUTERNAME,
 
-        # DriveLetter, Type String, Drive letter to evaluate BitLocker against.  if NullOrEmpty the default SystemDrive will be used.
         [Parameter(HelpMessage = "Drive letter format must be letter followed by colon, 'C:'")]
         [ValidatePattern('[a-zA-Z]:')]
         [String]
@@ -637,10 +650,16 @@ Function Get-BitLockerStatus
 .DESCRIPTION
     Invokes BitLocker Drive Encryption on an Encryptable Volume with a TPM and Numrical Password Key Protectors.
     If the Trusted Platform Module is not currently owned, ownership will be taken with randomized 15 character password.
-.INPUT
+.INPUTS
     System.String.
-.OUTPUT
+.OUTPUTS
     None.
+.PARAMETER ComputerName
+    System to invoke BitLocker against.
+.PARAMETER DriveLetter
+    Drive letter to invoke BitLocker against.  if NullOrEmpty the SystemDrive will be used.
+.PARAMETER ADKeyBackup
+    Backups recovery information to the AD DS Object.
 .EXAMPLE
     Invoke-BitLockerWithTPMAndNumricalKeyProtectors
 .EXAMPLE
@@ -662,22 +681,19 @@ Function Invoke-BitLockerWithTPMAndNumricalKeyProtectors
     [OutputType([Void])] 
     Param
     (
-        # ComputerName, Type String, System to invoke BitLocker against.
         [Parameter(ValueFromPipeline = $true)]
         [ValidateScript({ if (Test-Connection -ComputerName $_ -Quiet -Count 2){ $true }})]
         [String[]]
         $ComputerName = $env:COMPUTERNAME,
 
-        # DriveLetter, Type String, Drive letter to invoke BitLocker against.  if NullOrEmpty the SystemDrive will be used.
         [Parameter()]
         [ValidatePattern('[a-zA-Z]:')]
         [String]
         $DriveLetter,
 
-        # ADKeyBackup, Type Switch, Backups recovery information to the AD DS Object.
         [Parameter()]
         [Switch]
-        $ADKeyBackup = $false
+        $ADKeyBackup
     )
 
     if (-not (Test-HPTPMEnabledAndActivated -ComputerName $ComputerName))
@@ -721,7 +737,7 @@ Function Invoke-BitLockerWithTPMAndNumricalKeyProtectors
     if (-not ($volume.GetKeyProtectors(3).VolumeKeyProtectorID)) 
     {
         $volume.ProtectKeyWithNumericalPassword() | Out-Null
-        if ($ADKeyBackup) 
+        if ($ADKeyBackup.IsPresent) 
         {
             try 
             {
@@ -759,6 +775,14 @@ Function Invoke-BitLockerWithTPMAndNumricalKeyProtectors
     None.
 .OUTPUTS
     System.Array.
+.PARAMETER SqlServer
+    The SQL Server containing the ConfigMgr database.
+.PARAMETER ConnectionPort
+    Port to connect to SQL server with, defualt value is 1433.
+.PARAMETER Database
+    The name of the ConfigMgr database.
+.PARAMETER IntergratedSecurity
+    Use the currently logged on users credentials.
 .EXAMPLE
     Get-UnEncryptedWorkstationsFromCMDB -Datbase CM_123
 .EXAMPLE
@@ -776,25 +800,22 @@ Function Get-UnEncryptedWorkstationsFromCMDB
     [OutputType([Array])]
     Param
     (
-        # SqlServer, Type String, The SQL Server containing the ConfigMgr database.
         [Parameter()]
         [ValidateScript({ if (-not(Test-Connection -ComputerName $_ -Quiet -Count 2)) { throw "Failed to connect to $_.  Please ensure the system is available." } else { $true } })]
         [String]
         $SqlServer = $env:COMPUTERNAME,
 
-        # ConnectionPort, Type Int, Port to connect to SQL server with, defualt value is 1433.
         [Parameter()]
         [ValidateRange(1,50009)]
         [Alias("Port")]
         [Int]
         $ConnectionPort = 1433,
 
-        # Database, Type String, The name of the ConfigMgr database.
         [Parameter(Mandatory = $true)]
         [String]
         $Database,
 
-        # IntergratedSecurity, Type Switch, Use the currently logged on users credentials.
+        [Parameter()]
         [Switch]
         $IntergratedSecurity
     )

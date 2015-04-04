@@ -1,34 +1,25 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta charset="UTF-8">
     <title>HPTPMAndBitLocker by dotps1</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>HPTPMAndBitLocker</h1>
-        <p>Custom Powershell Module to ease TPM and BitLocker Administration for HP Workstations</p>
+    <section class="page-header">
+      <h1 class="project-name">HPTPMAndBitLocker</h1>
+      <h2 class="project-tagline">Custom Powershell Module to ease TPM and BitLocker Administration for HP Workstations</h2>
+      <a href="https://github.com/dotps1/HPTPMAndBitLocker" class="btn">View on GitHub</a>
+      <a href="https://github.com/dotps1/HPTPMAndBitLocker/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/dotps1/HPTPMAndBitLocker/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-        <p class="view"><a href="https://github.com/dotps1/HPTPMAndBitLocker">View the Project on GitHub <small>dotps1/HPTPMAndBitLocker</small></a></p>
-
-
-        <ul>
-          <li><a href="https://github.com/dotps1/HPTPMAndBitLocker/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/dotps1/HPTPMAndBitLocker/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/dotps1/HPTPMAndBitLocker">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h3>
+    <section class="main-content">
+      <h3>
 <a id="this-module-has-the-ability-to-modify-bios-settings-use-at-your-own-risk" class="anchor" href="#this-module-has-the-ability-to-modify-bios-settings-use-at-your-own-risk" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>THIS MODULE HAS THE ABILITY TO MODIFY BIOS SETTINGS USE AT YOUR OWN RISK</em>
 </h3>
 
@@ -52,36 +43,36 @@ Also, the BiosConfigurationUtility from HP is even more cumbersome to manage TPM
 <p>The three HP tailored functions are <em>-HP</em> are tailored specifically for HP BIOS and TPM administration, essentially replacing the BiosConfigurationUtility usage for TPM.  The remaining functions can be used on any workstations.</p>
 
 <div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Configure TPM on HP Models:</span>
-<span class="pl-k"><span class="pl-k">Import-Module</span></span> .\HPTpmAndBitLocker.psm1
+<span class="pl-c1">Import-Module</span> .\HPTpmAndBitLocker.psm1
 <span class="pl-c"># Current Setup Password, if there is not a current password, one will randomly be generated, and removed after configuration completes.</span>
 <span class="pl-c"># A Setup Password is required for pragmatically modifying the BIOS.</span>
-<span class="pl-vo">$password</span> <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>
+<span class="pl-k">$</span><span class="pl-smi">password</span> <span class="pl-k">=</span> <span class="pl-s">""</span>
 
-<span class="pl-k">if</span> (<span class="pl-k">-not</span> (<span class="pl-k"><span class="pl-k">Test-HPTPMEnabledAndActivated</span></span>))
+<span class="pl-k">if</span> <span class="pl-k">(</span><span class="pl-k">-not</span> <span class="pl-k">(</span><span class="pl-c1">Test-HPTPMEnabledAndActivated</span><span class="pl-k">)</span><span class="pl-k">)</span>
 {
-    <span class="pl-k">if</span>(<span class="pl-k">-not</span>(<span class="pl-k"><span class="pl-k">Test-HPBiosSetupPasswordIsSet</span></span>))
+    <span class="pl-k">if</span><span class="pl-k">(</span><span class="pl-k">-not</span><span class="pl-k">(</span><span class="pl-c1">Test-HPBiosSetupPasswordIsSet</span><span class="pl-k">)</span><span class="pl-k">)</span>
     {
-        <span class="pl-vo">$password</span> <span class="pl-k">=</span> powershell <span class="pl-s1"><span class="pl-pds">"</span>. .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers<span class="pl-pds">"</span></span>
-        <span class="pl-vo">$randomPasswordUsed</span> <span class="pl-k">=</span> <span class="pl-vo">$true</span>
-        <span class="pl-k"><span class="pl-k">Set-HPBiosSetupPassword</span></span> <span class="pl-k">-</span>NewPassword <span class="pl-vo">$password</span>
+        <span class="pl-k">$</span><span class="pl-smi">password</span> <span class="pl-k">=</span> powershell <span class="pl-s">". .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"</span>
+        <span class="pl-k">$</span><span class="pl-smi">randomPasswordUsed</span> <span class="pl-k">=</span> <span class="pl-k">$</span><span class="pl-c1">true</span>
+        <span class="pl-c1">Set-HPBiosSetupPassword</span> <span class="pl-k">-</span>NewPassword <span class="pl-k">$</span><span class="pl-smi">password</span>
     }
 
-    <span class="pl-k"><span class="pl-k">Invoke-HPTPM</span></span> <span class="pl-k">-</span>Password <span class="pl-vo">$password</span>
+    <span class="pl-c1">Invoke-HPTPM</span> <span class="pl-k">-</span>Password <span class="pl-k">$</span><span class="pl-smi">password</span>
 
-    <span class="pl-k">if</span> (<span class="pl-vo">$randomPasswordUsed</span>)
+    <span class="pl-k">if</span> <span class="pl-k">(</span><span class="pl-k">$</span><span class="pl-smi">randomPasswordUsed</span><span class="pl-k">)</span>
     {
-        <span class="pl-k"><span class="pl-k">Set-HPBiosSetupPassword</span></span> <span class="pl-k">-</span>NewPassword <span class="pl-s1"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span> <span class="pl-k">-</span>CurrentPassword <span class="pl-vo">$password</span>
+        <span class="pl-c1">Set-HPBiosSetupPassword</span> <span class="pl-k">-</span>NewPassword <span class="pl-s">" "</span> <span class="pl-k">-</span>CurrentPassword <span class="pl-k">$</span><span class="pl-smi">password</span>
     }
 }</pre></div>
 
 <p>I have included a function in this module that will get unencrypted PCs from a SCCM database so you can foreach the value on the systems and enforce BDE.</p>
 
-<div class="highlight highlight-PowerShell"><pre><span class="pl-k"><span class="pl-k">Import-Module</span></span> HPTPMAndBitLocker
-[String[]]<span class="pl-vo">$unEncryptedWorkStations</span> <span class="pl-k">=</span> (<span class="pl-k"><span class="pl-k">Get-UnEncryptedWorkstationsFromCMDB</span></span> <span class="pl-k">-</span>SqlServer SCCM_DB_Server <span class="pl-k">-</span>Database CM_ABC <span class="pl-k">-</span>IntergratedSecurity).ComputerName
+<div class="highlight highlight-PowerShell"><pre><span class="pl-c1">Import-Module</span> HPTPMAndBitLocker
+<span class="pl-e">[String[]]</span><span class="pl-k">$</span><span class="pl-smi">unEncryptedWorkStations</span> <span class="pl-k">=</span> <span class="pl-k">(</span><span class="pl-c1">Get-UnEncryptedWorkstationsFromCMDB</span> <span class="pl-k">-</span>SqlServer SCCM_DB_Server <span class="pl-k">-</span>Database CM_ABC <span class="pl-k">-</span>IntergratedSecurity<span class="pl-k">)</span>.ComputerName
 
-foreach (<span class="pl-vo">$workstation</span> <span class="pl-k">in</span> <span class="pl-vo">$unEncryptedWorkStations</span>)
+<span class="pl-k">foreach</span> <span class="pl-k">(</span><span class="pl-k">$</span><span class="pl-smi">workstation</span> <span class="pl-k">in</span> <span class="pl-k">$</span><span class="pl-smi">unEncryptedWorkStations</span><span class="pl-k">)</span>
 {
-<span class="pl-c">    # do things to Enforce BitLocker....</span>
+    <span class="pl-c"># do things to Enforce BitLocker....</span>
 }</pre></div>
 
 <p><strong>UPDATE</strong></p>
@@ -90,12 +81,12 @@ foreach (<span class="pl-vo">$workstation</span> <span class="pl-k">in</span> <s
 
 <div class="highlight highlight-PowerShell"><pre><span class="pl-c"># Globals</span>
 
-<span class="pl-vo">$SqlServer</span> <span class="pl-k">=</span> [String]::Empty
-<span class="pl-vo">$CCMDatabase</span> <span class="pl-k">=</span> [String]::Empty
+<span class="pl-k">$</span><span class="pl-smi">SqlServer</span> <span class="pl-k">=</span> <span class="pl-e">[String]</span>::Empty
+<span class="pl-k">$</span><span class="pl-smi">CCMDatabase</span> <span class="pl-k">=</span> <span class="pl-e">[String]</span>::Empty
 
-<span class="pl-k">if</span> ([String]::IsNullOrEmpty(<span class="pl-vo">$SqlServer</span>) <span class="pl-k">-</span><span class="pl-k">or</span> [String]::IsNullOrEmpty(<span class="pl-vo">$CCMDatabase</span>))
+<span class="pl-k">if</span> <span class="pl-k">(</span><span class="pl-e">[String]</span>::IsNullOrEmpty<span class="pl-k">(</span><span class="pl-k">$</span><span class="pl-smi">SqlServer</span><span class="pl-k">)</span> <span class="pl-k">-or</span> <span class="pl-e">[String]</span>::IsNullOrEmpty<span class="pl-k">(</span><span class="pl-k">$</span><span class="pl-smi">CCMDatabase</span><span class="pl-k">)</span><span class="pl-k">)</span>
 {
-    throw <span class="pl-s1"><span class="pl-pds">"</span>You must provide the CCM SqlServerName and Database to use this script<span class="pl-pds">"</span></span>
+    <span class="pl-k">throw</span> <span class="pl-s">"You must provide the CCM SqlServerName and Database to use this script"</span>
     <span class="pl-k">exit</span>
 }
 
@@ -104,150 +95,153 @@ foreach (<span class="pl-vo">$workstation</span> <span class="pl-k">in</span> <s
 <span class="pl-c"># Functions</span>
 
 <span class="pl-c">&lt;#</span>
-<span class="pl-c">.SYNOPSIS</span>
+<span class="pl-c"><span class="pl-c"><span class="pl-c1">.</span><span class="pl-k">SYNOPSIS</span></span></span>
 <span class="pl-c">    Logs Events to a a logfile.</span>
-<span class="pl-c">.DESCRIPTION</span>
+<span class="pl-c"><span class="pl-c"><span class="pl-c1">.</span><span class="pl-k">DESCRIPTION</span></span></span>
 <span class="pl-c">    Logs all errors foreach operation to a file.</span>
 <span class="pl-c">.INPUT</span>
 <span class="pl-c">    System.String</span>
 <span class="pl-c">.OUTPUT</span>
 <span class="pl-c">    None.</span>
-<span class="pl-c">.EXAMPLE</span>
+<span class="pl-c"><span class="pl-c"><span class="pl-c1">.</span><span class="pl-k">EXAMPLE</span></span></span>
 <span class="pl-c">    Write-LogEntry -Path C:\My.log -Event "MyEvent: Event"</span>
 <span class="pl-c">#&gt;</span>
-Function <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span>
+<span class="pl-k">Function</span> <span class="pl-en">Write-LogEntry</span>
 {
-    [CmdletBinding()]
-    [OutputType([Void])]
-    Param
-    (
-<span class="pl-c">        # Path, Type string, File path to the log.</span>
-        [Parameter(<span class="pl-vpf">Mandatory</span> <span class="pl-k">=</span> <span class="pl-vo">$true</span>)]
-        [String]
-        <span class="pl-vo">$Path</span>,
+    <span class="pl-ent">[CmdletBindin<span class="pl-ent">g</span></span><span class="pl-e">()</span><span class="pl-ent">]</span>
+    <span class="pl-ent">[OutputTyp<span class="pl-ent">e</span></span><span class="pl-e">([<span class="pl-e"><span class="pl-e"><span class="pl-c1">Void</span><span class="pl-smi">]</span></span></span>)</span><span class="pl-ent">]</span>
+    <span class="pl-k">Param</span>
+    <span class="pl-k">(</span>
+        <span class="pl-c"># Path, Type string, File path to the log.</span>
+        <span class="pl-ent">[Paramete<span class="pl-ent">r</span></span><span class="pl-e">(<span class="pl-e"><span class="pl-e"><span class="pl-c1">Mandatory</span> =<span class="pl-smi"> $true</span></span></span>)</span><span class="pl-ent">]</span>
+        <span class="pl-e">[String]</span>
+        <span class="pl-k">$</span><span class="pl-smi">Path</span><span class="pl-k">,</span>
 
-<span class="pl-c">        # Event, Type string, Event entry to append to the log.</span>
-        [Parameter(<span class="pl-vpf">Mandatory</span> <span class="pl-k">=</span> <span class="pl-vo">$true</span>,
-                <span class="pl-vpf">ValueFromPipeLineByPropertyName</span> <span class="pl-k">=</span> <span class="pl-vo">$true</span>)]
-        [String[]]
-        <span class="pl-vo">$Event</span>
-    )
+        <span class="pl-c"># Event, Type string, Event entry to append to the log.</span>
+        <span class="pl-ent">[Paramete<span class="pl-ent">r</span></span><span class="pl-e">(<span class="pl-e"><span class="pl-e"><span class="pl-c1">Mandatory</span> =<span class="pl-smi"> $true</span></span></span>,</span>
+<span class="pl-e">                <span class="pl-e"><span class="pl-e"><span class="pl-c1">ValueFromPipeLineByPropertyName</span> =<span class="pl-smi"> $true</span></span></span>)</span><span class="pl-ent">]</span>
+        <span class="pl-e">[String[]]</span>
+        <span class="pl-k">$</span><span class="pl-c1">Event</span>
+    <span class="pl-k">)</span>
 
-    <span class="pl-k"><span class="pl-k">Add-Content</span></span> <span class="pl-vo">$Path</span> <span class="pl-k">-</span>Value ((<span class="pl-k"><span class="pl-k">Get-Date</span></span>).ToLongDateString()<span class="pl-k">+</span><span class="pl-s1"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span><span class="pl-k">+</span>(<span class="pl-k"><span class="pl-k">Get-Date</span></span>).ToLongTimeString()<span class="pl-k">+</span><span class="pl-s1"><span class="pl-pds">"</span>: <span class="pl-pds">"</span></span><span class="pl-k">+</span><span class="pl-vo">$Event</span>)
+    <span class="pl-c1">Add-Content</span> <span class="pl-k">$</span><span class="pl-smi">Path</span> <span class="pl-k">-</span>Value <span class="pl-k">(</span><span class="pl-k">(</span><span class="pl-c1">Get-Date</span><span class="pl-k">)</span>.ToLongDateString<span class="pl-k">()</span><span class="pl-k">+</span><span class="pl-s">" "</span><span class="pl-k">+</span><span class="pl-k">(</span><span class="pl-c1">Get-Date</span><span class="pl-k">)</span>.ToLongTimeString<span class="pl-k">()</span><span class="pl-k">+</span><span class="pl-s">": "</span><span class="pl-k">+</span><span class="pl-k">$</span><span class="pl-c1">Event</span><span class="pl-k">)</span>
 }
 
 <span class="pl-c"># End Functions</span>
 
 <span class="pl-c"># Main</span>
 
-<span class="pl-k"><span class="pl-k">Import-Module</span></span> HPTPMAndBitLocker
-<span class="pl-vo">$password</span> <span class="pl-k">=</span> PowerShell <span class="pl-s1"><span class="pl-pds">"</span>. .\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers<span class="pl-pds">"</span></span>
-<span class="pl-vo">$log</span> <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">"</span>.\Logs\$(Get-Date -Format yyyyMMdd)_Enforce-BDE.ps1.log<span class="pl-pds">"</span></span>
-[String[]]<span class="pl-vo">$unEncryptedWorkStations</span> <span class="pl-k">=</span> (<span class="pl-k"><span class="pl-k">Get-UnEncryptedWorkstationsFromCCMDB</span></span> <span class="pl-k">-</span>SqlServer <span class="pl-vo">$SqlServer</span> <span class="pl-k">-</span>Database <span class="pl-vo">$CCMDatabase</span> <span class="pl-k">-</span>IntergratedSecurity).ComputerName
+<span class="pl-c1">Import-Module</span> HPTPMAndBitLocker
+<span class="pl-k">$</span><span class="pl-smi">password</span> <span class="pl-k">=</span> PowerShell <span class="pl-s">". .\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"</span>
+<span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">=</span> <span class="pl-s">".\Logs\<span class="pl-k">$(</span><span class="pl-c1">Get-Date</span> <span class="pl-k">-</span>Format yyyyMMdd<span class="pl-k">)</span>_Enforce-BDE.ps1.log"</span>
+<span class="pl-e">[String[]]</span><span class="pl-k">$</span><span class="pl-smi">unEncryptedWorkStations</span> <span class="pl-k">=</span> <span class="pl-k">(</span><span class="pl-c1">Get-UnEncryptedWorkstationsFromCCMDB</span> <span class="pl-k">-</span>SqlServer <span class="pl-k">$</span><span class="pl-smi">SqlServer</span> <span class="pl-k">-</span>Database <span class="pl-k">$</span><span class="pl-smi">CCMDatabase</span> <span class="pl-k">-</span>IntergratedSecurity<span class="pl-k">)</span>.ComputerName
 
-<span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>####################################<span class="pl-pds">"</span></span>
-<span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>##### START OF ENFORCEMENT RUN #####<span class="pl-pds">"</span></span>
-<span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>####################################<span class="pl-pds">"</span></span>
-<span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event (<span class="pl-s1"><span class="pl-pds">"</span>Total Number of Unencrypted Workstations: $($unEncryptedWorkStations.Length)<span class="pl-pds">"</span></span>)
+<span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"####################################"</span>
+<span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"##### START OF ENFORCEMENT RUN #####"</span>
+<span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"####################################"</span>
+<span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-k">(</span><span class="pl-s">"Total Number of Unencrypted Workstations: <span class="pl-k">$(</span><span class="pl-k">$</span><span class="pl-smi">unEncryptedWorkStations</span><span class="pl-en">.Length</span><span class="pl-k">)</span>"</span><span class="pl-k">)</span>
 
-foreach (<span class="pl-vo">$computer</span> <span class="pl-k">in</span> <span class="pl-vo">$unEncryptedWorkStations</span>)
+<span class="pl-k">foreach</span> <span class="pl-k">(</span><span class="pl-k">$</span><span class="pl-smi">computer</span> <span class="pl-k">in</span> <span class="pl-k">$</span><span class="pl-smi">unEncryptedWorkStations</span><span class="pl-k">)</span>
 {
-    <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>Attempting to ping $computer...<span class="pl-pds">"</span></span>
+    <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"Attempting to ping <span class="pl-k">$</span><span class="pl-smi">computer</span>..."</span>
 
-    <span class="pl-k">if</span> (<span class="pl-k">-not</span> (<span class="pl-k"><span class="pl-k">Test-Connection</span></span> <span class="pl-vo">$computer</span> <span class="pl-k">-</span>Count <span class="pl-c1">1</span> <span class="pl-k">-</span>ErrorAction SilentlyContinue))
+    <span class="pl-k">if</span> <span class="pl-k">(</span><span class="pl-k">-not</span> <span class="pl-k">(</span><span class="pl-c1">Test-Connection</span> <span class="pl-k">$</span><span class="pl-smi">computer</span> <span class="pl-k">-</span>Count <span class="pl-c1"><span class="pl-c1">1</span></span> <span class="pl-k">-</span>ErrorAction SilentlyContinue<span class="pl-k">)</span><span class="pl-k">)</span>
     {
-        <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-vo">$Error</span>[<span class="pl-c1">0</span>].ToString()
+        <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-k">$</span><span class="pl-c1">Error</span><span class="pl-e">[</span><span class="pl-c1"><span class="pl-c1">0</span></span><span class="pl-e">]</span>.ToString<span class="pl-k">()</span>
     }
     <span class="pl-k">else</span>
     {
-        <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>Successfully contacted $computer.<span class="pl-pds">"</span></span>
+        <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"Successfully contacted <span class="pl-k">$</span><span class="pl-smi">computer</span>."</span>
 
-        <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>Testing for TrueCrypt Disk Encryption on $computer...<span class="pl-pds">"</span></span>
-        <span class="pl-k">if</span> (<span class="pl-k"><span class="pl-k">Test-Path</span></span> <span class="pl-s1"><span class="pl-pds">"</span>$env:ProgramData\TrueCrypt\Original System Loader<span class="pl-pds">"</span></span>)
+        <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"Testing for TrueCrypt Disk Encryption on <span class="pl-k">$</span><span class="pl-smi">computer</span>..."</span>
+        <span class="pl-k">if</span> <span class="pl-k">(</span><span class="pl-c1">Test-Path</span> <span class="pl-s">"<span class="pl-k">$</span><span class="pl-c1">env:</span><span class="pl-smi">ProgramData</span>\TrueCrypt\Original System Loader"</span><span class="pl-k">)</span>
         {
-            <span class="pl-vo">$SMSCli</span> <span class="pl-k">=</span> [WmiClass]<span class="pl-s1"><span class="pl-pds">"</span>\\$computer\root\ccm:SMS_Client<span class="pl-pds">"</span></span>
-            <span class="pl-vo">$SMSCli</span>.TriggerSchedule(<span class="pl-s1"><span class="pl-pds">"</span>{00000000-0000-0000-0000-000000000002}<span class="pl-pds">"</span></span>) <span class="pl-k">|</span> <span class="pl-k"><span class="pl-k">Out-Null</span></span>
-            <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>Computer is fully encrypted with TrueCrypt Full Disk Encryption, triggering ccm software inventory cycle for $computer...<span class="pl-pds">"</span></span>
+            <span class="pl-k">$</span><span class="pl-smi">SMSCli</span> <span class="pl-k">=</span> <span class="pl-e">[WmiClass]</span><span class="pl-s">"\\<span class="pl-k">$</span><span class="pl-smi">computer</span>\root\ccm:SMS_Client"</span>
+            <span class="pl-k">$</span><span class="pl-smi">SMSCli</span><span class="pl-en">.TriggerSchedule</span><span class="pl-k">(</span><span class="pl-s">"{00000000-0000-0000-0000-000000000002}"</span><span class="pl-k">)</span> <span class="pl-k">|</span> <span class="pl-c1">Out-Null</span>
+            <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"Computer is fully encrypted with TrueCrypt Full Disk Encryption, triggering ccm software inventory cycle for <span class="pl-k">$</span><span class="pl-smi">computer</span>..."</span>
             <span class="pl-k">break</span>
         }
         <span class="pl-k">else</span>
         {
-            <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>TrueCrypt Disk Encryption not detected on $computer...<span class="pl-pds">"</span></span>
+            <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"TrueCrypt Disk Encryption not detected on <span class="pl-k">$</span><span class="pl-smi">computer</span>..."</span>
         }
-        <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>Retrieving TPM status for $computer...<span class="pl-pds">"</span></span>
+        <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"Retrieving TPM status for <span class="pl-k">$</span><span class="pl-smi">computer</span>..."</span>
         <span class="pl-k">try</span>
         {
-            <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event (<span class="pl-s1"><span class="pl-pds">"</span>TPM Properly Configured: $(Test-HPTPMEnabledAndActivated -ComputerName $computer)<span class="pl-pds">"</span></span>) 
+            <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-k">(</span><span class="pl-s">"TPM Properly Configured: <span class="pl-k">$(</span><span class="pl-c1">Test-HPTPMEnabledAndActivated</span> <span class="pl-k">-</span>ComputerName <span class="pl-k">$</span><span class="pl-smi">computer</span><span class="pl-k">)</span>"</span><span class="pl-k">)</span> 
         }
-        catch
+        <span class="pl-k">catch</span>
         {
-            <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-vo">$error</span>[<span class="pl-c1">0</span>].ToString()
-            Continue
+            <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-k">$</span><span class="pl-c1">error</span><span class="pl-e">[</span><span class="pl-c1"><span class="pl-c1">0</span></span><span class="pl-e">]</span>.ToString<span class="pl-k">()</span>
+            <span class="pl-k">Continue</span>
         }
 
-        <span class="pl-k">if</span> (<span class="pl-k">-not</span> (<span class="pl-k"><span class="pl-k">Test-HPTPMEnabledAndActivated</span></span> <span class="pl-k">-</span>ComputerName <span class="pl-vo">$computer</span>))
+        <span class="pl-k">if</span> <span class="pl-k">(</span><span class="pl-k">-not</span> <span class="pl-k">(</span><span class="pl-c1">Test-HPTPMEnabledAndActivated</span> <span class="pl-k">-</span>ComputerName <span class="pl-k">$</span><span class="pl-smi">computer</span><span class="pl-k">)</span><span class="pl-k">)</span>
         {
-            <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>TPM is not properly configured on $computer.<span class="pl-pds">"</span></span>
-            <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>Retrieving setup password state on $computer...<span class="pl-pds">"</span></span>
+            <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"TPM is not properly configured on <span class="pl-k">$</span><span class="pl-smi">computer</span>."</span>
+            <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"Retrieving setup password state on <span class="pl-k">$</span><span class="pl-smi">computer</span>..."</span>
             <span class="pl-k">try</span>
             {
-                <span class="pl-k">if</span> (<span class="pl-k">-not</span>(<span class="pl-k"><span class="pl-k">Test-HPBiosSetupPasswordIsSet</span></span> <span class="pl-k">-</span>ComputerName <span class="pl-vo">$computer</span>))
+                <span class="pl-k">if</span> <span class="pl-k">(</span><span class="pl-k">-not</span><span class="pl-k">(</span><span class="pl-c1">Test-HPBiosSetupPasswordIsSet</span> <span class="pl-k">-</span>ComputerName <span class="pl-k">$</span><span class="pl-smi">computer</span><span class="pl-k">)</span><span class="pl-k">)</span>
                 {
-                    <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>Setup password is set: False<span class="pl-pds">"</span></span>
-                    <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event (<span class="pl-s1"><span class="pl-pds">"</span>Generating password: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> (<span class="pl-vo">$password</span> <span class="pl-k">=</span> powershell <span class="pl-s1"><span class="pl-pds">"</span>. .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers<span class="pl-pds">"</span></span>))
-                    <span class="pl-k"><span class="pl-k">Set-HPBiosSetupPassword</span></span> <span class="pl-k">-</span>ComputerName <span class="pl-vo">$computer</span> <span class="pl-k">-</span>NewPassword <span class="pl-vo">$password</span> <span class="pl-k">|</span> <span class="pl-k">%</span>{ <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-vo">$_</span> }
+                    <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"Setup password is set: False"</span>
+                    <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-k">(</span><span class="pl-s">"Generating password: "</span> <span class="pl-k">+</span> <span class="pl-k">(</span><span class="pl-k">$</span><span class="pl-smi">password</span> <span class="pl-k">=</span> powershell <span class="pl-s">". .\Scripts\New-RandomPassword.ps1; New-RandomPassword -Length 14 -Lowercase -Uppercase -Numbers"</span><span class="pl-k">)</span><span class="pl-k">)</span>
+                    <span class="pl-c1">Set-HPBiosSetupPassword</span> <span class="pl-k">-</span>ComputerName <span class="pl-k">$</span><span class="pl-smi">computer</span> <span class="pl-k">-</span>NewPassword <span class="pl-k">$</span><span class="pl-smi">password</span> <span class="pl-k">|</span> <span class="pl-k">%</span>{ <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-k">$</span><span class="pl-c1">_</span> }
                 }
-                <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>Setup password is set: True<span class="pl-pds">"</span></span>
-                <span class="pl-k"><span class="pl-k">Invoke-HPTPM</span></span> <span class="pl-k">-</span>ComputerName <span class="pl-vo">$computer</span> <span class="pl-k">-</span>Password <span class="pl-vo">$password</span> <span class="pl-k">|</span> <span class="pl-k">%</span>{ <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-vo">$_</span> }
-                <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>Removing Setup password from $computer...<span class="pl-pds">"</span></span>
-                <span class="pl-k"><span class="pl-k">Set-HPBiosSetupPassword</span></span> <span class="pl-k">-</span>ComputerName <span class="pl-vo">$computer</span> <span class="pl-k">-</span>NewPassword <span class="pl-s1"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span> <span class="pl-k">-</span>CurrentPassword <span class="pl-vo">$password</span> <span class="pl-k">|</span> <span class="pl-k">%</span>{ <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-vo">$_</span> }
-                <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>System reboot required to complete TPM configuration.  BitLocker will be enforced on next run after reboot.<span class="pl-pds">"</span></span>
+                <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"Setup password is set: True"</span>
+                <span class="pl-c1">Invoke-HPTPM</span> <span class="pl-k">-</span>ComputerName <span class="pl-k">$</span><span class="pl-smi">computer</span> <span class="pl-k">-</span>Password <span class="pl-k">$</span><span class="pl-smi">password</span> <span class="pl-k">|</span> <span class="pl-k">%</span>{ <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-k">$</span><span class="pl-c1">_</span> }
+                <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"Removing Setup password from <span class="pl-k">$</span><span class="pl-smi">computer</span>..."</span>
+                <span class="pl-c1">Set-HPBiosSetupPassword</span> <span class="pl-k">-</span>ComputerName <span class="pl-k">$</span><span class="pl-smi">computer</span> <span class="pl-k">-</span>NewPassword <span class="pl-s">" "</span> <span class="pl-k">-</span>CurrentPassword <span class="pl-k">$</span><span class="pl-smi">password</span> <span class="pl-k">|</span> <span class="pl-k">%</span>{ <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-k">$</span><span class="pl-c1">_</span> }
+                <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"System reboot required to complete TPM configuration.  BitLocker will be enforced on next run after reboot."</span>
             }
-            catch
+            <span class="pl-k">catch</span>
             {
-                <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-vo">$error</span>[<span class="pl-c1">0</span>].ToString()
-                Continue
+                <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-k">$</span><span class="pl-c1">error</span><span class="pl-e">[</span><span class="pl-c1"><span class="pl-c1">0</span></span><span class="pl-e">]</span>.ToString<span class="pl-k">()</span>
+                <span class="pl-k">Continue</span>
             }
         }
         <span class="pl-k">else</span>
         {
-            <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>TPM is properly configured on $computer.<span class="pl-pds">"</span></span>
-            <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>Retrieving BitLocker status on $computer...<span class="pl-pds">"</span></span>
-            <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event (<span class="pl-s1"><span class="pl-pds">"</span>Protection: $((Get-BitLockerStatus -ComputerName $computer).Protection)<span class="pl-pds">"</span></span>)
-            <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event (<span class="pl-s1"><span class="pl-pds">"</span>State: $((Get-BitLockerStatus -ComputerName $computer).State)<span class="pl-pds">"</span></span>)
-            <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event (<span class="pl-s1"><span class="pl-pds">"</span>Percentage: $((Get-BitLockerStatus -ComputerName $computer).Percentage)<span class="pl-pds">"</span></span>)
-            <span class="pl-k">if</span> ((<span class="pl-k"><span class="pl-k">Get-BitLockerStatus</span></span> <span class="pl-k">-</span>ComputerName <span class="pl-vo">$computer</span>).Protection <span class="pl-k">-</span>eq <span class="pl-s1"><span class="pl-pds">"</span>ProtectionOn<span class="pl-pds">"</span></span>)
+            <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"TPM is properly configured on <span class="pl-k">$</span><span class="pl-smi">computer</span>."</span>
+            <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"Retrieving BitLocker status on <span class="pl-k">$</span><span class="pl-smi">computer</span>..."</span>
+            <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-k">(</span><span class="pl-s">"Protection: <span class="pl-k">$(</span><span class="pl-k">(</span><span class="pl-c1">Get-BitLockerStatus</span> <span class="pl-k">-</span>ComputerName <span class="pl-k">$</span><span class="pl-smi">computer</span><span class="pl-k">)</span>.Protection<span class="pl-k">)</span>"</span><span class="pl-k">)</span>
+            <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-k">(</span><span class="pl-s">"State: <span class="pl-k">$(</span><span class="pl-k">(</span><span class="pl-c1">Get-BitLockerStatus</span> <span class="pl-k">-</span>ComputerName <span class="pl-k">$</span><span class="pl-smi">computer</span><span class="pl-k">)</span>.State<span class="pl-k">)</span>"</span><span class="pl-k">)</span>
+            <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-k">(</span><span class="pl-s">"Percentage: <span class="pl-k">$(</span><span class="pl-k">(</span><span class="pl-c1">Get-BitLockerStatus</span> <span class="pl-k">-</span>ComputerName <span class="pl-k">$</span><span class="pl-smi">computer</span><span class="pl-k">)</span>.Percentage<span class="pl-k">)</span>"</span><span class="pl-k">)</span>
+            <span class="pl-k">if</span> <span class="pl-k">(</span><span class="pl-k">(</span><span class="pl-c1">Get-BitLockerStatus</span> <span class="pl-k">-</span>ComputerName <span class="pl-k">$</span><span class="pl-smi">computer</span><span class="pl-k">)</span>.Protection <span class="pl-k">-eq</span> <span class="pl-s">"ProtectionOn"</span><span class="pl-k">)</span>
             {
-                <span class="pl-vo">$SMSCli</span> <span class="pl-k">=</span> [WmiClass]<span class="pl-s1"><span class="pl-pds">"</span>\\$computer\root\ccm:SMS_Client<span class="pl-pds">"</span></span>
-                <span class="pl-vo">$SMSCli</span>.TriggerSchedule(<span class="pl-s1"><span class="pl-pds">"</span>{00000000-0000-0000-0000-000000000001}<span class="pl-pds">"</span></span>) <span class="pl-k">|</span> <span class="pl-k"><span class="pl-k">Out-Null</span></span>
-                <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>Computer is fully encrypted and protection is on, triggering ccm hardware inventory cycle for $computer...<span class="pl-pds">"</span></span>
+                <span class="pl-k">$</span><span class="pl-smi">SMSCli</span> <span class="pl-k">=</span> <span class="pl-e">[WmiClass]</span><span class="pl-s">"\\<span class="pl-k">$</span><span class="pl-smi">computer</span>\root\ccm:SMS_Client"</span>
+                <span class="pl-k">$</span><span class="pl-smi">SMSCli</span><span class="pl-en">.TriggerSchedule</span><span class="pl-k">(</span><span class="pl-s">"{00000000-0000-0000-0000-000000000001}"</span><span class="pl-k">)</span> <span class="pl-k">|</span> <span class="pl-c1">Out-Null</span>
+                <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"Computer is fully encrypted and protection is on, triggering ccm hardware inventory cycle for <span class="pl-k">$</span><span class="pl-smi">computer</span>..."</span>
             }
-            elseif ((<span class="pl-k"><span class="pl-k">Get-BitLockerStatus</span></span> <span class="pl-k">-</span>ComputerName <span class="pl-vo">$computer</span>).State <span class="pl-k">-ne</span> <span class="pl-s1"><span class="pl-pds">"</span>EncryptionInProgress<span class="pl-pds">"</span></span>)
+            <span class="pl-k">elseif</span> <span class="pl-k">(</span><span class="pl-k">(</span><span class="pl-c1">Get-BitLockerStatus</span> <span class="pl-k">-</span>ComputerName <span class="pl-k">$</span><span class="pl-smi">computer</span><span class="pl-k">)</span>.State <span class="pl-k">-ne</span> <span class="pl-s">"EncryptionInProgress"</span><span class="pl-k">)</span>
             {
-                <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>Invoking BitLocker drive encryption on $computer.<span class="pl-pds">"</span></span>
+                <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"Invoking BitLocker drive encryption on <span class="pl-k">$</span><span class="pl-smi">computer</span>."</span>
 
-                <span class="pl-k"><span class="pl-k">Invoke-BitLockerWithTPMAndNumricalKeyProtectors</span></span> <span class="pl-k">-</span>ComputerName <span class="pl-vo">$computer</span> <span class="pl-k">-</span>ADKeyBackup <span class="pl-k">|</span> <span class="pl-k"><span class="pl-k">Out-Null</span></span>
+                <span class="pl-c1">Invoke-BitLockerWithTPMAndNumricalKeyProtectors</span> <span class="pl-k">-</span>ComputerName <span class="pl-k">$</span><span class="pl-smi">computer</span> <span class="pl-k">-</span>ADKeyBackup <span class="pl-k">|</span> <span class="pl-c1">Out-Null</span>
 
-                <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event (<span class="pl-s1"><span class="pl-pds">"</span>Protection: $((Get-BitLockerStatus -ComputerName $computer).Protection)<span class="pl-pds">"</span></span>)
-                <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event (<span class="pl-s1"><span class="pl-pds">"</span>State: $((Get-BitLockerStatus -ComputerName $computer).State)<span class="pl-pds">"</span></span>)
-                <span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event (<span class="pl-s1"><span class="pl-pds">"</span>Percentage: $((Get-BitLockerStatus -ComputerName $computer).Percentage)<span class="pl-pds">"</span></span>)
+                <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-k">(</span><span class="pl-s">"Protection: <span class="pl-k">$(</span><span class="pl-k">(</span><span class="pl-c1">Get-BitLockerStatus</span> <span class="pl-k">-</span>ComputerName <span class="pl-k">$</span><span class="pl-smi">computer</span><span class="pl-k">)</span>.Protection<span class="pl-k">)</span>"</span><span class="pl-k">)</span>
+                <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-k">(</span><span class="pl-s">"State: <span class="pl-k">$(</span><span class="pl-k">(</span><span class="pl-c1">Get-BitLockerStatus</span> <span class="pl-k">-</span>ComputerName <span class="pl-k">$</span><span class="pl-smi">computer</span><span class="pl-k">)</span>.State<span class="pl-k">)</span>"</span><span class="pl-k">)</span>
+                <span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-k">(</span><span class="pl-s">"Percentage: <span class="pl-k">$(</span><span class="pl-k">(</span><span class="pl-c1">Get-BitLockerStatus</span> <span class="pl-k">-</span>ComputerName <span class="pl-k">$</span><span class="pl-smi">computer</span><span class="pl-k">)</span>.Percentage<span class="pl-k">)</span>"</span><span class="pl-k">)</span>
             }
         }
     }
 }
 
-<span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>##################################<span class="pl-pds">"</span></span>
-<span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>##### END OF ENFORCEMENT RUN #####<span class="pl-pds">"</span></span>
-<span class="pl-k"><span class="pl-k">Write-LogEntry</span></span> <span class="pl-k">-</span>Path <span class="pl-vo">$log</span> <span class="pl-k">-</span>Event <span class="pl-s1"><span class="pl-pds">"</span>##################################<span class="pl-pds">"</span></span>
+<span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"##################################"</span>
+<span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"##### END OF ENFORCEMENT RUN #####"</span>
+<span class="pl-c1">Write-LogEntry</span> <span class="pl-k">-</span>Path <span class="pl-k">$</span><span class="pl-smi">log</span> <span class="pl-k">-</span>Event <span class="pl-s">"##################################"</span>
 
 <span class="pl-c"># End Main</span></pre></div>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/dotps1">dotps1</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/dotps1/HPTPMAndBitLocker">HPTPMAndBitLocker</a> is maintained by <a href="https://github.com/dotps1">dotps1</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
+
+    </section>
+
+  
   </body>
 </html>
+

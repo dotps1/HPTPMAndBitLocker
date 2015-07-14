@@ -54,7 +54,7 @@ foreach ($workstation in $unEncryptedWorkStations)
 	
 **UPDATE**
 
-I have added a second script in the .\Scripts Directory called Enforce-Bde.ps1 that has a full enforcement and logging, just sent the params for your Logs Directory and for your ConfigMgr SQL Server.  You need to enable BitLockerDrive status in your ConfigMgr Client Settings to use this Script.
+I have added a second script in the .\Scripts Directory called Enforce-Bde.ps1 that has a full enforcement and logging, just set the params for your Logs Directory and for your ConfigMgr SQL Server.  You need to enable BitLockerDrive status in your ConfigMgr Client Settings to use this Script.
 ```PowerShell
 # Globals
 
@@ -76,9 +76,9 @@ if ([String]::IsNullOrEmpty($SqlServer) -or [String]::IsNullOrEmpty($CCMDatabase
 	Logs Events to a a logfile.
 .DESCRIPTION
 	Logs all errors foreach operation to a file.
-.INPUT
+.INPUTS
     System.String
-.OUTPUT
+.OUTPUTS
     None.
 .EXAMPLE
 	Write-LogEntry -Path C:\My.log -Event "MyEvent: Event"
